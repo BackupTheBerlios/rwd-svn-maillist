@@ -1,0 +1,1669 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Rwd-svn] r23 - in trunk/human.r: app/controllers app/helpers	app/models app/views app/views/departments	app/views/employees app/views/jobs app/views/layouts	app/views/locations db db/migrate public/stylesheets test/functional
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/rwd-svn/2006-August/index.html" >
+   <LINK REL="made" HREF="mailto:rwd-svn%40lists.berlios.de?Subject=Re%3A%20%5BRwd-svn%5D%20r23%20-%20in%20trunk/human.r%3A%20app/controllers%20app/helpers%0A%09app/models%20app/views%20app/views/departments%0A%09app/views/employees%20app/views/jobs%20app/views/layouts%0A%09app/views/locations%20db%20db/migrate%20public/stylesheets%20test/functional&In-Reply-To=%3C200608071438.k77EcLYb025705%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000013.html">
+   <LINK REL="Next"  HREF="000014.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Rwd-svn] r23 - in trunk/human.r: app/controllers app/helpers	app/models app/views app/views/departments	app/views/employees app/views/jobs app/views/layouts	app/views/locations db db/migrate public/stylesheets test/functional</H1>
+    <B>rwd-svn at lists.berlios.de</B> 
+    <A HREF="mailto:rwd-svn%40lists.berlios.de?Subject=Re%3A%20%5BRwd-svn%5D%20r23%20-%20in%20trunk/human.r%3A%20app/controllers%20app/helpers%0A%09app/models%20app/views%20app/views/departments%0A%09app/views/employees%20app/views/jobs%20app/views/layouts%0A%09app/views/locations%20db%20db/migrate%20public/stylesheets%20test/functional&In-Reply-To=%3C200608071438.k77EcLYb025705%40sheep.berlios.de%3E"
+       TITLE="[Rwd-svn] r23 - in trunk/human.r: app/controllers app/helpers	app/models app/views app/views/departments	app/views/employees app/views/jobs app/views/layouts	app/views/locations db db/migrate public/stylesheets test/functional">rwd-svn at lists.berlios.de
+       </A><BR>
+    <I>Mon Aug  7 16:38:21 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000013.html">[Rwd-svn] r22 - trunk/human.r
+</A></li>
+        <LI>Next message: <A HREF="000014.html">[Rwd-svn] r24 - trunk/human.r
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#16">[ date ]</a>
+              <a href="thread.html#16">[ thread ]</a>
+              <a href="subject.html#16">[ subject ]</a>
+              <a href="author.html#16">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: aurelian
+Date: 2006-08-07 16:38:20 +0200 (Mon, 07 Aug 2006)
+New Revision: 23
+
+Added:
+   trunk/human.r/app/controllers/departments_controller.rb
+   trunk/human.r/app/controllers/employees_controller.rb
+   trunk/human.r/app/controllers/jobs_controller.rb
+   trunk/human.r/app/controllers/locations_controller.rb
+   trunk/human.r/app/helpers/departments_helper.rb
+   trunk/human.r/app/helpers/employees_helper.rb
+   trunk/human.r/app/helpers/jobs_helper.rb
+   trunk/human.r/app/helpers/locations_helper.rb
+   trunk/human.r/app/views/departments/
+   trunk/human.r/app/views/departments/_form.rhtml
+   trunk/human.r/app/views/departments/edit.rhtml
+   trunk/human.r/app/views/departments/list.rhtml
+   trunk/human.r/app/views/departments/new.rhtml
+   trunk/human.r/app/views/departments/show.rhtml
+   trunk/human.r/app/views/employees/
+   trunk/human.r/app/views/employees/_form.rhtml
+   trunk/human.r/app/views/employees/edit.rhtml
+   trunk/human.r/app/views/employees/list.rhtml
+   trunk/human.r/app/views/employees/new.rhtml
+   trunk/human.r/app/views/employees/show.rhtml
+   trunk/human.r/app/views/jobs/
+   trunk/human.r/app/views/jobs/_form.rhtml
+   trunk/human.r/app/views/jobs/edit.rhtml
+   trunk/human.r/app/views/jobs/list.rhtml
+   trunk/human.r/app/views/jobs/new.rhtml
+   trunk/human.r/app/views/jobs/show.rhtml
+   trunk/human.r/app/views/layouts/departments.rhtml
+   trunk/human.r/app/views/layouts/employees.rhtml
+   trunk/human.r/app/views/layouts/jobs.rhtml
+   trunk/human.r/app/views/layouts/locations.rhtml
+   trunk/human.r/app/views/locations/
+   trunk/human.r/app/views/locations/_form.rhtml
+   trunk/human.r/app/views/locations/edit.rhtml
+   trunk/human.r/app/views/locations/list.rhtml
+   trunk/human.r/app/views/locations/new.rhtml
+   trunk/human.r/app/views/locations/show.rhtml
+   trunk/human.r/db/migrate/005_remove_department_manager.rb
+   trunk/human.r/public/stylesheets/scaffold.css
+   trunk/human.r/test/functional/departments_controller_test.rb
+   trunk/human.r/test/functional/employees_controller_test.rb
+   trunk/human.r/test/functional/jobs_controller_test.rb
+   trunk/human.r/test/functional/locations_controller_test.rb
+Modified:
+   trunk/human.r/app/models/department.rb
+   trunk/human.r/app/models/employee.rb
+   trunk/human.r/app/models/job.rb
+   trunk/human.r/app/models/location.rb
+   trunk/human.r/db/migrate/002_create_locations.rb
+   trunk/human.r/db/migrate/003_create_employees.rb
+   trunk/human.r/db/schema.rb
+Log:
+ -- generated stuff &amp;&amp; some validations
+
+Added: trunk/human.r/app/controllers/departments_controller.rb
+===================================================================
+--- trunk/human.r/app/controllers/departments_controller.rb	2006-08-07 13:29:00 UTC (rev 22)
++++ trunk/human.r/app/controllers/departments_controller.rb	2006-08-07 14:38:20 UTC (rev 23)
+@@ -0,0 +1,57 @@
++class DepartmentsController &lt; ApplicationController
++  def index
++    list
++    render :action =&gt; 'list'
++  end
++
++  # GETs should be safe (see <A HREF="http://www.w3.org/2001/tag/doc/whenToUseGet.html">http://www.w3.org/2001/tag/doc/whenToUseGet.html</A>)
++  verify :method =&gt; :post, :only =&gt; [ :destroy, :create, :update ],
++         :redirect_to =&gt; { :action =&gt; :list }
++
++  def list
++    @department_pages, @departments = paginate :departments, :per_page =&gt; 10
++  end
++
++  def show
++    @department = Department.find(params[:id])
++  end
++
++  def new
++    @locations= Location.find(:all)
++    if @locations.size == 0
++      flash[:notice] = &quot;You should create a location first!&quot;
++      redirect_to :action=&gt;'new', :controller=&gt;'locations'
++    else
++      @department = Department.new
++    end
++  end
++
++  def create
++    @department = Department.new(params[:department])
++    if @department.save
++      flash[:notice] = 'Department was successfully created.'
++      redirect_to :action =&gt; 'list'
++    else
++      render :action =&gt; 'new'
++    end
++  end
++
++  def edit
++    @department = Department.find(params[:id])
++  end
++
++  def update
++    @department = Department.find(params[:id])
++    if @department.update_attributes(params[:department])
++      flash[:notice] = 'Department was successfully updated.'
++      redirect_to :action =&gt; 'show', :id =&gt; @department
++    else
++      render :action =&gt; 'edit'
++    end
++  end
++
++  def destroy
++    Department.find(params[:id]).destroy
++    redirect_to :action =&gt; 'list'
++  end
++end
+
+Added: trunk/human.r/app/controllers/employees_controller.rb
+===================================================================
+--- trunk/human.r/app/controllers/employees_controller.rb	2006-08-07 13:29:00 UTC (rev 22)
++++ trunk/human.r/app/controllers/employees_controller.rb	2006-08-07 14:38:20 UTC (rev 23)
+@@ -0,0 +1,51 @@
++class EmployeesController &lt; ApplicationController
++  def index
++    list
++    render :action =&gt; 'list'
++  end
++
++  # GETs should be safe (see <A HREF="http://www.w3.org/2001/tag/doc/whenToUseGet.html">http://www.w3.org/2001/tag/doc/whenToUseGet.html</A>)
++  verify :method =&gt; :post, :only =&gt; [ :destroy, :create, :update ],
++         :redirect_to =&gt; { :action =&gt; :list }
++
++  def list
++    @employee_pages, @employees = paginate :employees, :per_page =&gt; 10
++  end
++
++  def show
++    @employee = Employee.find(params[:id])
++  end
++
++  def new
++    @employee = Employee.new
++  end
++
++  def create
++    @employee = Employee.new(params[:employee])
++    if @employee.save
++      flash[:notice] = 'Employee was successfully created.'
++      redirect_to :action =&gt; 'list'
++    else
++      render :action =&gt; 'new'
++    end
++  end
++
++  def edit
++    @employee = Employee.find(params[:id])
++  end
++
++  def update
++    @employee = Employee.find(params[:id])
++    if @employee.update_attributes(params[:employee])
++      flash[:notice] = 'Employee was successfully updated.'
++      redirect_to :action =&gt; 'show', :id =&gt; @employee
++    else
++      render :action =&gt; 'edit'
++    end
++  end
++
++  def destroy
++    Employee.find(params[:id]).destroy
++    redirect_to :action =&gt; 'list'
++  end
++end
+
+Added: trunk/human.r/app/controllers/jobs_controller.rb
+===================================================================
+--- trunk/human.r/app/controllers/jobs_controller.rb	2006-08-07 13:29:00 UTC (rev 22)
++++ trunk/human.r/app/controllers/jobs_controller.rb	2006-08-07 14:38:20 UTC (rev 23)
+@@ -0,0 +1,51 @@
++class JobsController &lt; ApplicationController
++  def index
++    list
++    render :action =&gt; 'list'
++  end
++
++  # GETs should be safe (see <A HREF="http://www.w3.org/2001/tag/doc/whenToUseGet.html">http://www.w3.org/2001/tag/doc/whenToUseGet.html</A>)
++  verify :method =&gt; :post, :only =&gt; [ :destroy, :create, :update ],
++         :redirect_to =&gt; { :action =&gt; :list }
++
++  def list
++    @job_pages, @jobs = paginate :jobs, :per_page =&gt; 10
++  end
++
++  def show
++    @job = Job.find(params[:id])
++  end
++
++  def new
++    @job = Job.new
++  end
++
++  def create
++    @job = Job.new(params[:job])
++    if @job.save
++      flash[:notice] = 'Job was successfully created.'
++      redirect_to :action =&gt; 'list'
++    else
++      render :action =&gt; 'new'
++    end
++  end
++
++  def edit
++    @job = Job.find(params[:id])
++  end
++
++  def update
++    @job = Job.find(params[:id])
++    if @job.update_attributes(params[:job])
++      flash[:notice] = 'Job was successfully updated.'
++      redirect_to :action =&gt; 'show', :id =&gt; @job
++    else
++      render :action =&gt; 'edit'
++    end
++  end
++
++  def destroy
++    Job.find(params[:id]).destroy
++    redirect_to :action =&gt; 'list'
++  end
++end
+
+Added: trunk/human.r/app/controllers/locations_controller.rb
+===================================================================
+--- trunk/human.r/app/controllers/locations_controller.rb	2006-08-07 13:29:00 UTC (rev 22)
++++ trunk/human.r/app/controllers/locations_controller.rb	2006-08-07 14:38:20 UTC (rev 23)
+@@ -0,0 +1,51 @@
++class LocationsController &lt; ApplicationController
++  def index
++    list
++    render :action =&gt; 'list'
++  end
++
++  # GETs should be safe (see <A HREF="http://www.w3.org/2001/tag/doc/whenToUseGet.html">http://www.w3.org/2001/tag/doc/whenToUseGet.html</A>)
++  verify :method =&gt; :post, :only =&gt; [ :destroy, :create, :update ],
++         :redirect_to =&gt; { :action =&gt; :list }
++
++  def list
++    @location_pages, @locations = paginate :locations, :per_page =&gt; 10
++  end
++
++  def show
++    @location = Location.find(params[:id])
++  end
++
++  def new
++    @location = Location.new
++  end
++
++  def create
++    @location = Location.new(params[:location])
++    if @location.save
++      flash[:notice] = 'Location was successfully created.'
++      redirect_to :action =&gt; 'list'
++    else
++      render :action =&gt; 'new'
++    end
++  end
++
++  def edit
++    @location = Location.find(params[:id])
++  end
++
++  def update
++    @location = Location.find(params[:id])
++    if @location.update_attributes(params[:location])
++      flash[:notice] = 'Location was successfully updated.'
++      redirect_to :action =&gt; 'show', :id =&gt; @location
++    else
++      render :action =&gt; 'edit'
++    end
++  end
++
++  def destroy
++    Location.find(params[:id]).destroy
++    redirect_to :action =&gt; 'list'
++  end
++end
+
+Added: trunk/human.r/app/helpers/departments_helper.rb
+===================================================================
+--- trunk/human.r/app/helpers/departments_helper.rb	2006-08-07 13:29:00 UTC (rev 22)
++++ trunk/human.r/app/helpers/departments_helper.rb	2006-08-07 14:38:20 UTC (rev 23)
+@@ -0,0 +1,2 @@
++module DepartmentsHelper
++end
+
+Added: trunk/human.r/app/helpers/employees_helper.rb
+===================================================================
+--- trunk/human.r/app/helpers/employees_helper.rb	2006-08-07 13:29:00 UTC (rev 22)
++++ trunk/human.r/app/helpers/employees_helper.rb	2006-08-07 14:38:20 UTC (rev 23)
+@@ -0,0 +1,2 @@
++module EmployeesHelper
++end
+
+Added: trunk/human.r/app/helpers/jobs_helper.rb
+===================================================================
+--- trunk/human.r/app/helpers/jobs_helper.rb	2006-08-07 13:29:00 UTC (rev 22)
++++ trunk/human.r/app/helpers/jobs_helper.rb	2006-08-07 14:38:20 UTC (rev 23)
+@@ -0,0 +1,2 @@
++module JobsHelper
++end
+
+Added: trunk/human.r/app/helpers/locations_helper.rb
+===================================================================
+--- trunk/human.r/app/helpers/locations_helper.rb	2006-08-07 13:29:00 UTC (rev 22)
++++ trunk/human.r/app/helpers/locations_helper.rb	2006-08-07 14:38:20 UTC (rev 23)
+@@ -0,0 +1,2 @@
++module LocationsHelper
++end
+
+Modified: trunk/human.r/app/models/department.rb
+===================================================================
+--- trunk/human.r/app/models/department.rb	2006-08-07 13:29:00 UTC (rev 22)
++++ trunk/human.r/app/models/department.rb	2006-08-07 14:38:20 UTC (rev 23)
+@@ -1,2 +1,13 @@
++#
++# $Id$
++#
+ class Department &lt; ActiveRecord::Base
++  belongs_to :location
++  has_many :employees
++  
++  protected
++    validates_presence_of :name
++    validates_uniqueness_of :name
++    validates_presence_of :location
++
+ end
+
+
+Property changes on: trunk/human.r/app/models/department.rb
+___________________________________________________________________
+Name: svn:keywords
+   + Id
+
+Modified: trunk/human.r/app/models/employee.rb
+===================================================================
+--- trunk/human.r/app/models/employee.rb	2006-08-07 13:29:00 UTC (rev 22)
++++ trunk/human.r/app/models/employee.rb	2006-08-07 14:38:20 UTC (rev 23)
+@@ -1,2 +1,28 @@
++#
++# $Id$
++#
+ class Employee &lt; ActiveRecord::Base
++  belongs_to :department
++  belongs_to :job
++
++  protected
++
++    validates_uniqueness_of :email
++    validates_length_of :commission, :maximum =&gt; 2
++    validates_numericality_of :salary
++
++    validates_each :salary do | record, name, value |
++      if value &amp;&amp; (value &lt; 0 || value &gt; 999999)
++        record.errors.add name, &quot;Salary should be a positive number, maximum is 999999!&quot;
++      end
++    end
++
++    validate :commission_percent
++
++  private
++    
++    def commission_percent
++    end
++
+ end
++
+
+
+Property changes on: trunk/human.r/app/models/employee.rb
+___________________________________________________________________
+Name: svn:keywords
+   + Id
+
+Modified: trunk/human.r/app/models/job.rb
+===================================================================
+--- trunk/human.r/app/models/job.rb	2006-08-07 13:29:00 UTC (rev 22)
++++ trunk/human.r/app/models/job.rb	2006-08-07 14:38:20 UTC (rev 23)
+@@ -1,2 +1,20 @@
++#
++# $Id$
++#
+ class Job &lt; ActiveRecord::Base
++  has_many :employees
++
++  protected
++    validates_uniqueness_of :title
++    validates_presence_of :title
++    validates_numericality_of :min_salary, :only_integer =&gt; true
++    validates_numericality_of :max_salary, :only_integer =&gt; true
++   
++    validates_each :min_salary, :max_salary do | record, name, value |
++      if value &amp;&amp; (value &lt; 0 || value &gt; 999999)
++        record.errors.add name, &quot;Salary should be a positive number, maximum allowed is 999999!&quot;
++      end
++    end
++
+ end
++
+
+
+Property changes on: trunk/human.r/app/models/job.rb
+___________________________________________________________________
+Name: svn:keywords
+   + Id
+
+Modified: trunk/human.r/app/models/location.rb
+===================================================================
+--- trunk/human.r/app/models/location.rb	2006-08-07 13:29:00 UTC (rev 22)
++++ trunk/human.r/app/models/location.rb	2006-08-07 14:38:20 UTC (rev 23)
+@@ -1,2 +1,18 @@
++#
++# $Id$
++#
+ class Location &lt; ActiveRecord::Base
++  has_many :departments
++
++  def to_s
++    &quot;#{city} - #{street} (#{code})&quot;
++  end
++
++  protected
++    
++    validates_length_of   :code,   :maximum =&gt; 12
++    validates_length_of   :street, :maximum =&gt; 12
++    validates_presence_of :city
++
+ end
++
+
+
+Property changes on: trunk/human.r/app/models/location.rb
+___________________________________________________________________
+Name: svn:keywords
+   + Id
+
+Added: trunk/human.r/app/views/departments/_form.rhtml
+===================================================================
+--- trunk/human.r/app/views/departments/_form.rhtml	2006-08-07 13:29:00 UTC (rev 22)
++++ trunk/human.r/app/views/departments/_form.rhtml	2006-08-07 14:38:20 UTC (rev 23)
+@@ -0,0 +1,13 @@
++&lt;%= error_messages_for 'department' %&gt;
++
++&lt;!--[form:department]--&gt;
++
++&lt;p&gt;&lt;label for=&quot;department_name&quot;&gt;Name&lt;/label&gt;&lt;br/&gt;
++&lt;%= text_field 'department', 'name'  %&gt;&lt;/p&gt;
++
++&lt;p&gt;&lt;label for=&quot;department_location&quot;&gt;Location&lt;/label&gt;&lt;br/&gt;
++&lt;%= select(&quot;department&quot;, &quot;location_id&quot;, @locations.collect {|l| [ l, l.id ] }, { :include_blank =&gt; true }) %&gt;
++&lt;/p&gt;
++
++&lt;!--[eoform:department]--&gt;
++
+
+
+Property changes on: trunk/human.r/app/views/departments/_form.rhtml
+___________________________________________________________________
+Name: svn:keywords
+   + Id
+
+Added: trunk/human.r/app/views/departments/edit.rhtml
+===================================================================
+--- trunk/human.r/app/views/departments/edit.rhtml	2006-08-07 13:29:00 UTC (rev 22)
++++ trunk/human.r/app/views/departments/edit.rhtml	2006-08-07 14:38:20 UTC (rev 23)
+@@ -0,0 +1,9 @@
++&lt;h1&gt;Editing department&lt;/h1&gt;
++
++&lt;%= start_form_tag :action =&gt; 'update', :id =&gt; @department %&gt;
++  &lt;%= render :partial =&gt; 'form' %&gt;
++  &lt;%= submit_tag 'Edit' %&gt;
++&lt;%= end_form_tag %&gt;
++
++&lt;%= link_to 'Show', :action =&gt; 'show', :id =&gt; @department %&gt; |
++&lt;%= link_to 'Back', :action =&gt; 'list' %&gt;
+
+
+Property changes on: trunk/human.r/app/views/departments/edit.rhtml
+___________________________________________________________________
+Name: svn:keywords
+   + Id
+
+Added: trunk/human.r/app/views/departments/list.rhtml
+===================================================================
+--- trunk/human.r/app/views/departments/list.rhtml	2006-08-07 13:29:00 UTC (rev 22)
++++ trunk/human.r/app/views/departments/list.rhtml	2006-08-07 14:38:20 UTC (rev 23)
+@@ -0,0 +1,27 @@
++&lt;h1&gt;Listing departments&lt;/h1&gt;
++
++&lt;table&gt;
++  &lt;tr&gt;
++  &lt;% for column in Department.content_columns %&gt;
++    &lt;th&gt;&lt;%= column.human_name %&gt;&lt;/th&gt;
++  &lt;% end %&gt;
++  &lt;/tr&gt;
++  
++&lt;% for department in @departments %&gt;
++  &lt;tr&gt;
++  &lt;% for column in Department.content_columns %&gt;
++    &lt;td&gt;&lt;%=h department.send(column.name) %&gt;&lt;/td&gt;
++  &lt;% end %&gt;
++    &lt;td&gt;&lt;%= link_to 'Show', :action =&gt; 'show', :id =&gt; department %&gt;&lt;/td&gt;
++    &lt;td&gt;&lt;%= link_to 'Edit', :action =&gt; 'edit', :id =&gt; department %&gt;&lt;/td&gt;
++    &lt;td&gt;&lt;%= link_to 'Destroy', { :action =&gt; 'destroy', :id =&gt; department }, :confirm =&gt; 'Are you sure?', :post =&gt; true %&gt;&lt;/td&gt;
++  &lt;/tr&gt;
++&lt;% end %&gt;
++&lt;/table&gt;
++
++&lt;%= link_to 'Previous page', { :page =&gt; @department_pages.current.previous } if @department_pages.current.previous %&gt;
++&lt;%= link_to 'Next page', { :page =&gt; @department_pages.current.next } if @department_pages.current.next %&gt; 
++
++&lt;br /&gt;
++
++&lt;%= link_to 'New department', :action =&gt; 'new' %&gt;
+
+
+Property changes on: trunk/human.r/app/views/departments/list.rhtml
+___________________________________________________________________
+Name: svn:keywords
+   + Id
+
+Added: trunk/human.r/app/views/departments/new.rhtml
+===================================================================
+--- trunk/human.r/app/views/departments/new.rhtml	2006-08-07 13:29:00 UTC (rev 22)
++++ trunk/human.r/app/views/departments/new.rhtml	2006-08-07 14:38:20 UTC (rev 23)
+@@ -0,0 +1,8 @@
++&lt;h1&gt;New department&lt;/h1&gt;
++
++&lt;%= start_form_tag :action =&gt; 'create' %&gt;
++  &lt;%= render :partial =&gt; 'form' %&gt;
++  &lt;%= submit_tag &quot;Create&quot; %&gt;
++&lt;%= end_form_tag %&gt;
++
++&lt;%= link_to 'Back', :action =&gt; 'list' %&gt;
+
+
+Property changes on: trunk/human.r/app/views/departments/new.rhtml
+___________________________________________________________________
+Name: svn:keywords
+   + Id
+
+Added: trunk/human.r/app/views/departments/show.rhtml
+===================================================================
+--- trunk/human.r/app/views/departments/show.rhtml	2006-08-07 13:29:00 UTC (rev 22)
++++ trunk/human.r/app/views/departments/show.rhtml	2006-08-07 14:38:20 UTC (rev 23)
+@@ -0,0 +1,8 @@
++&lt;% for column in Department.content_columns %&gt;
++&lt;p&gt;
++  &lt;b&gt;&lt;%= column.human_name %&gt;:&lt;/b&gt; &lt;%=h @department.send(column.name) %&gt;
++&lt;/p&gt;
++&lt;% end %&gt;
++
++&lt;%= link_to 'Edit', :action =&gt; 'edit', :id =&gt; @department %&gt; |
++&lt;%= link_to 'Back', :action =&gt; 'list' %&gt;
+
+
+Property changes on: trunk/human.r/app/views/departments/show.rhtml
+___________________________________________________________________
+Name: svn:keywords
+   + Id
+
+Added: trunk/human.r/app/views/employees/_form.rhtml
+===================================================================
+--- trunk/human.r/app/views/employees/_form.rhtml	2006-08-07 13:29:00 UTC (rev 22)
++++ trunk/human.r/app/views/employees/_form.rhtml	2006-08-07 14:38:20 UTC (rev 23)
+@@ -0,0 +1,19 @@
++&lt;%= error_messages_for 'employee' %&gt;
++
++&lt;!--[form:employee]--&gt;
++&lt;p&gt;&lt;label for=&quot;employee_salary&quot;&gt;Salary&lt;/label&gt;&lt;br/&gt;
++&lt;%= text_field 'employee', 'salary'  %&gt;&lt;/p&gt;
++
++&lt;p&gt;&lt;label for=&quot;employee_commission&quot;&gt;Commission&lt;/label&gt;&lt;br/&gt;
++&lt;%= text_field 'employee', 'commission'  %&gt;&lt;/p&gt;
++
++&lt;p&gt;&lt;label for=&quot;employee_first_name&quot;&gt;First name&lt;/label&gt;&lt;br/&gt;
++&lt;%= text_field 'employee', 'first_name'  %&gt;&lt;/p&gt;
++
++&lt;p&gt;&lt;label for=&quot;employee_last_name&quot;&gt;Last name&lt;/label&gt;&lt;br/&gt;
++&lt;%= text_field 'employee', 'last_name'  %&gt;&lt;/p&gt;
++
++&lt;p&gt;&lt;label for=&quot;employee_email&quot;&gt;Email&lt;/label&gt;&lt;br/&gt;
++&lt;%= text_field 'employee', 'email'  %&gt;&lt;/p&gt;
++&lt;!--[eoform:employee]--&gt;
++
+
+
+Property changes on: trunk/human.r/app/views/employees/_form.rhtml
+___________________________________________________________________
+Name: svn:keywords
+   + Id
+
+Added: trunk/human.r/app/views/employees/edit.rhtml
+===================================================================
+--- trunk/human.r/app/views/employees/edit.rhtml	2006-08-07 13:29:00 UTC (rev 22)
++++ trunk/human.r/app/views/employees/edit.rhtml	2006-08-07 14:38:20 UTC (rev 23)
+@@ -0,0 +1,9 @@
++&lt;h1&gt;Editing employee&lt;/h1&gt;
++
++&lt;%= start_form_tag :action =&gt; 'update', :id =&gt; @employee %&gt;
++  &lt;%= render :partial =&gt; 'form' %&gt;
++  &lt;%= submit_tag 'Edit' %&gt;
++&lt;%= end_form_tag %&gt;
++
++&lt;%= link_to 'Show', :action =&gt; 'show', :id =&gt; @employee %&gt; |
++&lt;%= link_to 'Back', :action =&gt; 'list' %&gt;
+
+
+Property changes on: trunk/human.r/app/views/employees/edit.rhtml
+___________________________________________________________________
+Name: svn:keywords
+   + Id
+
+Added: trunk/human.r/app/views/employees/list.rhtml
+===================================================================
+--- trunk/human.r/app/views/employees/list.rhtml	2006-08-07 13:29:00 UTC (rev 22)
++++ trunk/human.r/app/views/employees/list.rhtml	2006-08-07 14:38:20 UTC (rev 23)
+@@ -0,0 +1,27 @@
++&lt;h1&gt;Listing employees&lt;/h1&gt;
++
++&lt;table&gt;
++  &lt;tr&gt;
++  &lt;% for column in Employee.content_columns %&gt;
++    &lt;th&gt;&lt;%= column.human_name %&gt;&lt;/th&gt;
++  &lt;% end %&gt;
++  &lt;/tr&gt;
++  
++&lt;% for employee in @employees %&gt;
++  &lt;tr&gt;
++  &lt;% for column in Employee.content_columns %&gt;
++    &lt;td&gt;&lt;%=h employee.send(column.name) %&gt;&lt;/td&gt;
++  &lt;% end %&gt;
++    &lt;td&gt;&lt;%= link_to 'Show', :action =&gt; 'show', :id =&gt; employee %&gt;&lt;/td&gt;
++    &lt;td&gt;&lt;%= link_to 'Edit', :action =&gt; 'edit', :id =&gt; employee %&gt;&lt;/td&gt;
++    &lt;td&gt;&lt;%= link_to 'Destroy', { :action =&gt; 'destroy', :id =&gt; employee }, :confirm =&gt; 'Are you sure?', :post =&gt; true %&gt;&lt;/td&gt;
++  &lt;/tr&gt;
++&lt;% end %&gt;
++&lt;/table&gt;
++
++&lt;%= link_to 'Previous page', { :page =&gt; @employee_pages.current.previous } if @employee_pages.current.previous %&gt;
++&lt;%= link_to 'Next page', { :page =&gt; @employee_pages.current.next } if @employee_pages.current.next %&gt; 
++
++&lt;br /&gt;
++
++&lt;%= link_to 'New employee', :action =&gt; 'new' %&gt;
+
+
+Property changes on: trunk/human.r/app/views/employees/list.rhtml
+___________________________________________________________________
+Name: svn:keywords
+   + Id
+
+Added: trunk/human.r/app/views/employees/new.rhtml
+===================================================================
+--- trunk/human.r/app/views/employees/new.rhtml	2006-08-07 13:29:00 UTC (rev 22)
++++ trunk/human.r/app/views/employees/new.rhtml	2006-08-07 14:38:20 UTC (rev 23)
+@@ -0,0 +1,8 @@
++&lt;h1&gt;New employee&lt;/h1&gt;
++
++&lt;%= start_form_tag :action =&gt; 'create' %&gt;
++  &lt;%= render :partial =&gt; 'form' %&gt;
++  &lt;%= submit_tag &quot;Create&quot; %&gt;
++&lt;%= end_form_tag %&gt;
++
++&lt;%= link_to 'Back', :action =&gt; 'list' %&gt;
+
+
+Property changes on: trunk/human.r/app/views/employees/new.rhtml
+___________________________________________________________________
+Name: svn:keywords
+   + Id
+
+Added: trunk/human.r/app/views/employees/show.rhtml
+===================================================================
+--- trunk/human.r/app/views/employees/show.rhtml	2006-08-07 13:29:00 UTC (rev 22)
++++ trunk/human.r/app/views/employees/show.rhtml	2006-08-07 14:38:20 UTC (rev 23)
+@@ -0,0 +1,8 @@
++&lt;% for column in Employee.content_columns %&gt;
++&lt;p&gt;
++  &lt;b&gt;&lt;%= column.human_name %&gt;:&lt;/b&gt; &lt;%=h @employee.send(column.name) %&gt;
++&lt;/p&gt;
++&lt;% end %&gt;
++
++&lt;%= link_to 'Edit', :action =&gt; 'edit', :id =&gt; @employee %&gt; |
++&lt;%= link_to 'Back', :action =&gt; 'list' %&gt;
+
+
+Property changes on: trunk/human.r/app/views/employees/show.rhtml
+___________________________________________________________________
+Name: svn:keywords
+   + Id
+
+Added: trunk/human.r/app/views/jobs/_form.rhtml
+===================================================================
+--- trunk/human.r/app/views/jobs/_form.rhtml	2006-08-07 13:29:00 UTC (rev 22)
++++ trunk/human.r/app/views/jobs/_form.rhtml	2006-08-07 14:38:20 UTC (rev 23)
+@@ -0,0 +1,13 @@
++&lt;%= error_messages_for 'job' %&gt;
++
++&lt;!--[form:job]--&gt;
++&lt;p&gt;&lt;label for=&quot;job_title&quot;&gt;Title&lt;/label&gt;&lt;br/&gt;
++&lt;%= text_field 'job', 'title'  %&gt;&lt;/p&gt;
++
++&lt;p&gt;&lt;label for=&quot;job_min_salary&quot;&gt;Min salary&lt;/label&gt;&lt;br/&gt;
++&lt;%= text_field 'job', 'min_salary'  %&gt;&lt;/p&gt;
++
++&lt;p&gt;&lt;label for=&quot;job_max_salary&quot;&gt;Max salary&lt;/label&gt;&lt;br/&gt;
++&lt;%= text_field 'job', 'max_salary'  %&gt;&lt;/p&gt;
++&lt;!--[eoform:job]--&gt;
++
+
+
+Property changes on: trunk/human.r/app/views/jobs/_form.rhtml
+___________________________________________________________________
+Name: svn:keywords
+   + Id
+
+Added: trunk/human.r/app/views/jobs/edit.rhtml
+===================================================================
+--- trunk/human.r/app/views/jobs/edit.rhtml	2006-08-07 13:29:00 UTC (rev 22)
++++ trunk/human.r/app/views/jobs/edit.rhtml	2006-08-07 14:38:20 UTC (rev 23)
+@@ -0,0 +1,9 @@
++&lt;h1&gt;Editing job&lt;/h1&gt;
++
++&lt;%= start_form_tag :action =&gt; 'update', :id =&gt; @job %&gt;
++  &lt;%= render :partial =&gt; 'form' %&gt;
++  &lt;%= submit_tag 'Edit' %&gt;
++&lt;%= end_form_tag %&gt;
++
++&lt;%= link_to 'Show', :action =&gt; 'show', :id =&gt; @job %&gt; |
++&lt;%= link_to 'Back', :action =&gt; 'list' %&gt;
+
+
+Property changes on: trunk/human.r/app/views/jobs/edit.rhtml
+___________________________________________________________________
+Name: svn:keywords
+   + Id
+
+Added: trunk/human.r/app/views/jobs/list.rhtml
+===================================================================
+--- trunk/human.r/app/views/jobs/list.rhtml	2006-08-07 13:29:00 UTC (rev 22)
++++ trunk/human.r/app/views/jobs/list.rhtml	2006-08-07 14:38:20 UTC (rev 23)
+@@ -0,0 +1,27 @@
++&lt;h1&gt;Listing jobs&lt;/h1&gt;
++
++&lt;table&gt;
++  &lt;tr&gt;
++  &lt;% for column in Job.content_columns %&gt;
++    &lt;th&gt;&lt;%= column.human_name %&gt;&lt;/th&gt;
++  &lt;% end %&gt;
++  &lt;/tr&gt;
++  
++&lt;% for job in @jobs %&gt;
++  &lt;tr&gt;
++  &lt;% for column in Job.content_columns %&gt;
++    &lt;td&gt;&lt;%=h job.send(column.name) %&gt;&lt;/td&gt;
++  &lt;% end %&gt;
++    &lt;td&gt;&lt;%= link_to 'Show', :action =&gt; 'show', :id =&gt; job %&gt;&lt;/td&gt;
++    &lt;td&gt;&lt;%= link_to 'Edit', :action =&gt; 'edit', :id =&gt; job %&gt;&lt;/td&gt;
++    &lt;td&gt;&lt;%= link_to 'Destroy', { :action =&gt; 'destroy', :id =&gt; job }, :confirm =&gt; 'Are you sure?', :post =&gt; true %&gt;&lt;/td&gt;
++  &lt;/tr&gt;
++&lt;% end %&gt;
++&lt;/table&gt;
++
++&lt;%= link_to 'Previous page', { :page =&gt; @job_pages.current.previous } if @job_pages.current.previous %&gt;
++&lt;%= link_to 'Next page', { :page =&gt; @job_pages.current.next } if @job_pages.current.next %&gt; 
++
++&lt;br /&gt;
++
++&lt;%= link_to 'New job', :action =&gt; 'new' %&gt;
+
+
+Property changes on: trunk/human.r/app/views/jobs/list.rhtml
+___________________________________________________________________
+Name: svn:keywords
+   + Id
+
+Added: trunk/human.r/app/views/jobs/new.rhtml
+===================================================================
+--- trunk/human.r/app/views/jobs/new.rhtml	2006-08-07 13:29:00 UTC (rev 22)
++++ trunk/human.r/app/views/jobs/new.rhtml	2006-08-07 14:38:20 UTC (rev 23)
+@@ -0,0 +1,8 @@
++&lt;h1&gt;New job&lt;/h1&gt;
++
++&lt;%= start_form_tag :action =&gt; 'create' %&gt;
++  &lt;%= render :partial =&gt; 'form' %&gt;
++  &lt;%= submit_tag &quot;Create&quot; %&gt;
++&lt;%= end_form_tag %&gt;
++
++&lt;%= link_to 'Back', :action =&gt; 'list' %&gt;
+
+
+Property changes on: trunk/human.r/app/views/jobs/new.rhtml
+___________________________________________________________________
+Name: svn:keywords
+   + Id
+
+Added: trunk/human.r/app/views/jobs/show.rhtml
+===================================================================
+--- trunk/human.r/app/views/jobs/show.rhtml	2006-08-07 13:29:00 UTC (rev 22)
++++ trunk/human.r/app/views/jobs/show.rhtml	2006-08-07 14:38:20 UTC (rev 23)
+@@ -0,0 +1,8 @@
++&lt;% for column in Job.content_columns %&gt;
++&lt;p&gt;
++  &lt;b&gt;&lt;%= column.human_name %&gt;:&lt;/b&gt; &lt;%=h @job.send(column.name) %&gt;
++&lt;/p&gt;
++&lt;% end %&gt;
++
++&lt;%= link_to 'Edit', :action =&gt; 'edit', :id =&gt; @job %&gt; |
++&lt;%= link_to 'Back', :action =&gt; 'list' %&gt;
+
+
+Property changes on: trunk/human.r/app/views/jobs/show.rhtml
+___________________________________________________________________
+Name: svn:keywords
+   + Id
+
+Added: trunk/human.r/app/views/layouts/departments.rhtml
+===================================================================
+--- trunk/human.r/app/views/layouts/departments.rhtml	2006-08-07 13:29:00 UTC (rev 22)
++++ trunk/human.r/app/views/layouts/departments.rhtml	2006-08-07 14:38:20 UTC (rev 23)
+@@ -0,0 +1,13 @@
++&lt;html&gt;
++&lt;head&gt;
++  &lt;title&gt;Departments: &lt;%= controller.action_name %&gt;&lt;/title&gt;
++  &lt;%= stylesheet_link_tag 'scaffold' %&gt;
++&lt;/head&gt;
++&lt;body&gt;
++
++&lt;p style=&quot;color: green&quot;&gt;&lt;%= flash[:notice] %&gt;&lt;/p&gt;
++
++&lt;%= @content_for_layout %&gt;
++
++&lt;/body&gt;
++&lt;/html&gt;
+
+
+Property changes on: trunk/human.r/app/views/layouts/departments.rhtml
+___________________________________________________________________
+Name: svn:keywords
+   + Id
+
+Added: trunk/human.r/app/views/layouts/employees.rhtml
+===================================================================
+--- trunk/human.r/app/views/layouts/employees.rhtml	2006-08-07 13:29:00 UTC (rev 22)
++++ trunk/human.r/app/views/layouts/employees.rhtml	2006-08-07 14:38:20 UTC (rev 23)
+@@ -0,0 +1,13 @@
++&lt;html&gt;
++&lt;head&gt;
++  &lt;title&gt;Employees: &lt;%= controller.action_name %&gt;&lt;/title&gt;
++  &lt;%= stylesheet_link_tag 'scaffold' %&gt;
++&lt;/head&gt;
++&lt;body&gt;
++
++&lt;p style=&quot;color: green&quot;&gt;&lt;%= flash[:notice] %&gt;&lt;/p&gt;
++
++&lt;%= @content_for_layout %&gt;
++
++&lt;/body&gt;
++&lt;/html&gt;
+
+
+Property changes on: trunk/human.r/app/views/layouts/employees.rhtml
+___________________________________________________________________
+Name: svn:keywords
+   + Id
+
+Added: trunk/human.r/app/views/layouts/jobs.rhtml
+===================================================================
+--- trunk/human.r/app/views/layouts/jobs.rhtml	2006-08-07 13:29:00 UTC (rev 22)
++++ trunk/human.r/app/views/layouts/jobs.rhtml	2006-08-07 14:38:20 UTC (rev 23)
+@@ -0,0 +1,13 @@
++&lt;html&gt;
++&lt;head&gt;
++  &lt;title&gt;Jobs: &lt;%= controller.action_name %&gt;&lt;/title&gt;
++  &lt;%= stylesheet_link_tag 'scaffold' %&gt;
++&lt;/head&gt;
++&lt;body&gt;
++
++&lt;p style=&quot;color: green&quot;&gt;&lt;%= flash[:notice] %&gt;&lt;/p&gt;
++
++&lt;%= @content_for_layout %&gt;
++
++&lt;/body&gt;
++&lt;/html&gt;
+
+
+Property changes on: trunk/human.r/app/views/layouts/jobs.rhtml
+___________________________________________________________________
+Name: svn:keywords
+   + Id
+
+Added: trunk/human.r/app/views/layouts/locations.rhtml
+===================================================================
+--- trunk/human.r/app/views/layouts/locations.rhtml	2006-08-07 13:29:00 UTC (rev 22)
++++ trunk/human.r/app/views/layouts/locations.rhtml	2006-08-07 14:38:20 UTC (rev 23)
+@@ -0,0 +1,13 @@
++&lt;html&gt;
++&lt;head&gt;
++  &lt;title&gt;Locations: &lt;%= controller.action_name %&gt;&lt;/title&gt;
++  &lt;%= stylesheet_link_tag 'scaffold' %&gt;
++&lt;/head&gt;
++&lt;body&gt;
++
++&lt;p style=&quot;color: green&quot;&gt;&lt;%= flash[:notice] %&gt;&lt;/p&gt;
++
++&lt;%= @content_for_layout %&gt;
++
++&lt;/body&gt;
++&lt;/html&gt;
+
+Added: trunk/human.r/app/views/locations/_form.rhtml
+===================================================================
+--- trunk/human.r/app/views/locations/_form.rhtml	2006-08-07 13:29:00 UTC (rev 22)
++++ trunk/human.r/app/views/locations/_form.rhtml	2006-08-07 14:38:20 UTC (rev 23)
+@@ -0,0 +1,13 @@
++&lt;%= error_messages_for 'location' %&gt;
++
++&lt;!--[form:location]--&gt;
++&lt;p&gt;&lt;label for=&quot;location_street&quot;&gt;Street&lt;/label&gt;&lt;br/&gt;
++&lt;%= text_field 'location', 'street'  %&gt;&lt;/p&gt;
++
++&lt;p&gt;&lt;label for=&quot;location_code&quot;&gt;Code&lt;/label&gt;&lt;br/&gt;
++&lt;%= text_field 'location', 'code'  %&gt;&lt;/p&gt;
++
++&lt;p&gt;&lt;label for=&quot;location_city&quot;&gt;City&lt;/label&gt;&lt;br/&gt;
++&lt;%= text_field 'location', 'city'  %&gt;&lt;/p&gt;
++&lt;!--[eoform:location]--&gt;
++
+
+
+Property changes on: trunk/human.r/app/views/locations/_form.rhtml
+___________________________________________________________________
+Name: svn:keywords
+   + Id
+
+Added: trunk/human.r/app/views/locations/edit.rhtml
+===================================================================
+--- trunk/human.r/app/views/locations/edit.rhtml	2006-08-07 13:29:00 UTC (rev 22)
++++ trunk/human.r/app/views/locations/edit.rhtml	2006-08-07 14:38:20 UTC (rev 23)
+@@ -0,0 +1,9 @@
++&lt;h1&gt;Editing location&lt;/h1&gt;
++
++&lt;%= start_form_tag :action =&gt; 'update', :id =&gt; @location %&gt;
++  &lt;%= render :partial =&gt; 'form' %&gt;
++  &lt;%= submit_tag 'Edit' %&gt;
++&lt;%= end_form_tag %&gt;
++
++&lt;%= link_to 'Show', :action =&gt; 'show', :id =&gt; @location %&gt; |
++&lt;%= link_to 'Back', :action =&gt; 'list' %&gt;
+
+
+Property changes on: trunk/human.r/app/views/locations/edit.rhtml
+___________________________________________________________________
+Name: svn:keywords
+   + Id
+
+Added: trunk/human.r/app/views/locations/list.rhtml
+===================================================================
+--- trunk/human.r/app/views/locations/list.rhtml	2006-08-07 13:29:00 UTC (rev 22)
++++ trunk/human.r/app/views/locations/list.rhtml	2006-08-07 14:38:20 UTC (rev 23)
+@@ -0,0 +1,27 @@
++&lt;h1&gt;Listing locations&lt;/h1&gt;
++
++&lt;table&gt;
++  &lt;tr&gt;
++  &lt;% for column in Location.content_columns %&gt;
++    &lt;th&gt;&lt;%= column.human_name %&gt;&lt;/th&gt;
++  &lt;% end %&gt;
++  &lt;/tr&gt;
++  
++&lt;% for location in @locations %&gt;
++  &lt;tr&gt;
++  &lt;% for column in Location.content_columns %&gt;
++    &lt;td&gt;&lt;%=h location.send(column.name) %&gt;&lt;/td&gt;
++  &lt;% end %&gt;
++    &lt;td&gt;&lt;%= link_to 'Show', :action =&gt; 'show', :id =&gt; location %&gt;&lt;/td&gt;
++    &lt;td&gt;&lt;%= link_to 'Edit', :action =&gt; 'edit', :id =&gt; location %&gt;&lt;/td&gt;
++    &lt;td&gt;&lt;%= link_to 'Destroy', { :action =&gt; 'destroy', :id =&gt; location }, :confirm =&gt; 'Are you sure?', :post =&gt; true %&gt;&lt;/td&gt;
++  &lt;/tr&gt;
++&lt;% end %&gt;
++&lt;/table&gt;
++
++&lt;%= link_to 'Previous page', { :page =&gt; @location_pages.current.previous } if @location_pages.current.previous %&gt;
++&lt;%= link_to 'Next page', { :page =&gt; @location_pages.current.next } if @location_pages.current.next %&gt; 
++
++&lt;br /&gt;
++
++&lt;%= link_to 'New location', :action =&gt; 'new' %&gt;
+
+
+Property changes on: trunk/human.r/app/views/locations/list.rhtml
+___________________________________________________________________
+Name: svn:keywords
+   + Id
+
+Added: trunk/human.r/app/views/locations/new.rhtml
+===================================================================
+--- trunk/human.r/app/views/locations/new.rhtml	2006-08-07 13:29:00 UTC (rev 22)
++++ trunk/human.r/app/views/locations/new.rhtml	2006-08-07 14:38:20 UTC (rev 23)
+@@ -0,0 +1,8 @@
++&lt;h1&gt;New location&lt;/h1&gt;
++
++&lt;%= start_form_tag :action =&gt; 'create' %&gt;
++  &lt;%= render :partial =&gt; 'form' %&gt;
++  &lt;%= submit_tag &quot;Create&quot; %&gt;
++&lt;%= end_form_tag %&gt;
++
++&lt;%= link_to 'Back', :action =&gt; 'list' %&gt;
+
+
+Property changes on: trunk/human.r/app/views/locations/new.rhtml
+___________________________________________________________________
+Name: svn:keywords
+   + Id
+
+Added: trunk/human.r/app/views/locations/show.rhtml
+===================================================================
+--- trunk/human.r/app/views/locations/show.rhtml	2006-08-07 13:29:00 UTC (rev 22)
++++ trunk/human.r/app/views/locations/show.rhtml	2006-08-07 14:38:20 UTC (rev 23)
+@@ -0,0 +1,8 @@
++&lt;% for column in Location.content_columns %&gt;
++&lt;p&gt;
++  &lt;b&gt;&lt;%= column.human_name %&gt;:&lt;/b&gt; &lt;%=h @location.send(column.name) %&gt;
++&lt;/p&gt;
++&lt;% end %&gt;
++
++&lt;%= link_to 'Edit', :action =&gt; 'edit', :id =&gt; @location %&gt; |
++&lt;%= link_to 'Back', :action =&gt; 'list' %&gt;
+
+
+Property changes on: trunk/human.r/app/views/locations/show.rhtml
+___________________________________________________________________
+Name: svn:keywords
+   + Id
+
+Modified: trunk/human.r/db/migrate/002_create_locations.rb
+===================================================================
+--- trunk/human.r/db/migrate/002_create_locations.rb	2006-08-07 13:29:00 UTC (rev 22)
++++ trunk/human.r/db/migrate/002_create_locations.rb	2006-08-07 14:38:20 UTC (rev 23)
+@@ -14,3 +14,4 @@
+     drop_table :locations
+   end
+ end
++
+
+Modified: trunk/human.r/db/migrate/003_create_employees.rb
+===================================================================
+--- trunk/human.r/db/migrate/003_create_employees.rb	2006-08-07 13:29:00 UTC (rev 22)
++++ trunk/human.r/db/migrate/003_create_employees.rb	2006-08-07 14:38:20 UTC (rev 23)
+@@ -18,3 +18,4 @@
+     drop_table :employees
+   end
+ end
++
+
+Added: trunk/human.r/db/migrate/005_remove_department_manager.rb
+===================================================================
+--- trunk/human.r/db/migrate/005_remove_department_manager.rb	2006-08-07 13:29:00 UTC (rev 22)
++++ trunk/human.r/db/migrate/005_remove_department_manager.rb	2006-08-07 14:38:20 UTC (rev 23)
+@@ -0,0 +1,15 @@
++#
++# $Id$
++#
++class RemoveDepartmentManager &lt; ActiveRecord::Migration
++
++  def self.up
++    remove_column Department.table_name, :manager_id
++  end
++
++  def self.down
++    add_column Department.table_name, :manager_id, :integer, :null=&gt;false
++  end
++
++end
++
+
+
+Property changes on: trunk/human.r/db/migrate/005_remove_department_manager.rb
+___________________________________________________________________
+Name: svn:keywords
+   + Id
+
+Modified: trunk/human.r/db/schema.rb
+===================================================================
+--- trunk/human.r/db/schema.rb	2006-08-07 13:29:00 UTC (rev 22)
++++ trunk/human.r/db/schema.rb	2006-08-07 14:38:20 UTC (rev 23)
+@@ -2,11 +2,10 @@
+ # migrations feature of ActiveRecord to incrementally modify your database, and
+ # then regenerate this schema definition.
+ 
+-ActiveRecord::Schema.define(:version =&gt; 4) do
++ActiveRecord::Schema.define(:version =&gt; 5) do
+ 
+   create_table &quot;departments&quot;, :force =&gt; true do |t|
+     t.column &quot;location_id&quot;, :integer, :null =&gt; false
+-    t.column &quot;manager_id&quot;, :integer, :null =&gt; false
+     t.column &quot;name&quot;, :string, :null =&gt; false
+   end
+ 
+
+
+Property changes on: trunk/human.r/db/schema.rb
+___________________________________________________________________
+Name: svn:keywords
+   + Id
+
+Added: trunk/human.r/public/stylesheets/scaffold.css
+===================================================================
+--- trunk/human.r/public/stylesheets/scaffold.css	2006-08-07 13:29:00 UTC (rev 22)
++++ trunk/human.r/public/stylesheets/scaffold.css	2006-08-07 14:38:20 UTC (rev 23)
+@@ -0,0 +1,74 @@
++body { background-color: #fff; color: #333; }
++
++body, p, ol, ul, td {
++  font-family: verdana, arial, helvetica, sans-serif;
++  font-size:   13px;
++  line-height: 18px;
++}
++
++pre {
++  background-color: #eee;
++  padding: 10px;
++  font-size: 11px;
++}
++
++a { color: #000; }
++a:visited { color: #666; }
++a:hover { color: #fff; background-color:#000; }
++
++.fieldWithErrors {
++  padding: 2px;
++  background-color: red;
++  display: table;
++}
++
++#errorExplanation {
++  width: 400px;
++  border: 2px solid red;
++  padding: 7px;
++  padding-bottom: 12px;
++  margin-bottom: 20px;
++  background-color: #f0f0f0;
++}
++
++#errorExplanation h2 {
++  text-align: left;
++  font-weight: bold;
++  padding: 5px 5px 5px 15px;
++  font-size: 12px;
++  margin: -7px;
++  background-color: #c00;
++  color: #fff;
++}
++
++#errorExplanation p {
++  color: #333;
++  margin-bottom: 0;
++  padding: 5px;
++}
++
++#errorExplanation ul li {
++  font-size: 12px;
++  list-style: square;
++}
++
++div.uploadStatus {
++  margin: 5px;
++}
++
++div.progressBar {
++  margin: 5px;
++}
++
++div.progressBar div.border {
++  background-color: #fff;
++  border: 1px solid grey;
++  width: 100%;
++}
++
++div.progressBar div.background {
++  background-color: #333;
++  height: 18px;
++  width: 0%;
++}
++
+
+
+Property changes on: trunk/human.r/public/stylesheets/scaffold.css
+___________________________________________________________________
+Name: svn:keywords
+   + Id
+
+Added: trunk/human.r/test/functional/departments_controller_test.rb
+===================================================================
+--- trunk/human.r/test/functional/departments_controller_test.rb	2006-08-07 13:29:00 UTC (rev 22)
++++ trunk/human.r/test/functional/departments_controller_test.rb	2006-08-07 14:38:20 UTC (rev 23)
+@@ -0,0 +1,88 @@
++require File.dirname(__FILE__) + '/../test_helper'
++require 'departments_controller'
++
++# Re-raise errors caught by the controller.
++class DepartmentsController; def rescue_action(e) raise e end; end
++
++class DepartmentsControllerTest &lt; Test::Unit::TestCase
++  fixtures :departments
++
++  def setup
++    @controller = DepartmentsController.new
++    @request    = ActionController::TestRequest.new
++    @response   = ActionController::TestResponse.new
++  end
++
++  def test_index
++    get :index
++    assert_response :success
++    assert_template 'list'
++  end
++
++  def test_list
++    get :list
++
++    assert_response :success
++    assert_template 'list'
++
++    assert_not_nil assigns(:departments)
++  end
++
++  def test_show
++    get :show, :id =&gt; 1
++
++    assert_response :success
++    assert_template 'show'
++
++    assert_not_nil assigns(:department)
++    assert assigns(:department).valid?
++  end
++
++  def test_new
++    get :new
++
++    assert_response :success
++    assert_template 'new'
++
++    assert_not_nil assigns(:department)
++  end
++
++  def test_create
++    num_departments = Department.count
++
++    post :create, :department =&gt; {}
++
++    assert_response :redirect
++    assert_redirected_to :action =&gt; 'list'
++
++    assert_equal num_departments + 1, Department.count
++  end
++
++  def test_edit
++    get :edit, :id =&gt; 1
++
++    assert_response :success
++    assert_template 'edit'
++
++    assert_not_nil assigns(:department)
++    assert assigns(:department).valid?
++  end
++
++  def test_update
++    post :update, :id =&gt; 1
++    assert_response :redirect
++    assert_redirected_to :action =&gt; 'show', :id =&gt; 1
++  end
++
++  def test_destroy
++    assert_not_nil Department.find(1)
++
++    post :destroy, :id =&gt; 1
++    assert_response :redirect
++    assert_redirected_to :action =&gt; 'list'
++
++    assert_raise(ActiveRecord::RecordNotFound) {
++      Department.find(1)
++    }
++  end
++end
+
+
+Property changes on: trunk/human.r/test/functional/departments_controller_test.rb
+___________________________________________________________________
+Name: svn:keywords
+   + Id
+
+Added: trunk/human.r/test/functional/employees_controller_test.rb
+===================================================================
+--- trunk/human.r/test/functional/employees_controller_test.rb	2006-08-07 13:29:00 UTC (rev 22)
++++ trunk/human.r/test/functional/employees_controller_test.rb	2006-08-07 14:38:20 UTC (rev 23)
+@@ -0,0 +1,88 @@
++require File.dirname(__FILE__) + '/../test_helper'
++require 'employees_controller'
++
++# Re-raise errors caught by the controller.
++class EmployeesController; def rescue_action(e) raise e end; end
++
++class EmployeesControllerTest &lt; Test::Unit::TestCase
++  fixtures :employees
++
++  def setup
++    @controller = EmployeesController.new
++    @request    = ActionController::TestRequest.new
++    @response   = ActionController::TestResponse.new
++  end
++
++  def test_index
++    get :index
++    assert_response :success
++    assert_template 'list'
++  end
++
++  def test_list
++    get :list
++
++    assert_response :success
++    assert_template 'list'
++
++    assert_not_nil assigns(:employees)
++  end
++
++  def test_show
++    get :show, :id =&gt; 1
++
++    assert_response :success
++    assert_template 'show'
++
++    assert_not_nil assigns(:employee)
++    assert assigns(:employee).valid?
++  end
++
++  def test_new
++    get :new
++
++    assert_response :success
++    assert_template 'new'
++
++    assert_not_nil assigns(:employee)
++  end
++
++  def test_create
++    num_employees = Employee.count
++
++    post :create, :employee =&gt; {}
++
++    assert_response :redirect
++    assert_redirected_to :action =&gt; 'list'
++
++    assert_equal num_employees + 1, Employee.count
++  end
++
++  def test_edit
++    get :edit, :id =&gt; 1
++
++    assert_response :success
++    assert_template 'edit'
++
++    assert_not_nil assigns(:employee)
++    assert assigns(:employee).valid?
++  end
++
++  def test_update
++    post :update, :id =&gt; 1
++    assert_response :redirect
++    assert_redirected_to :action =&gt; 'show', :id =&gt; 1
++  end
++
++  def test_destroy
++    assert_not_nil Employee.find(1)
++
++    post :destroy, :id =&gt; 1
++    assert_response :redirect
++    assert_redirected_to :action =&gt; 'list'
++
++    assert_raise(ActiveRecord::RecordNotFound) {
++      Employee.find(1)
++    }
++  end
++end
+
+
+Property changes on: trunk/human.r/test/functional/employees_controller_test.rb
+___________________________________________________________________
+Name: svn:keywords
+   + Id
+
+Added: trunk/human.r/test/functional/jobs_controller_test.rb
+===================================================================
+--- trunk/human.r/test/functional/jobs_controller_test.rb	2006-08-07 13:29:00 UTC (rev 22)
++++ trunk/human.r/test/functional/jobs_controller_test.rb	2006-08-07 14:38:20 UTC (rev 23)
+@@ -0,0 +1,88 @@
++require File.dirname(__FILE__) + '/../test_helper'
++require 'jobs_controller'
++
++# Re-raise errors caught by the controller.
++class JobsController; def rescue_action(e) raise e end; end
++
++class JobsControllerTest &lt; Test::Unit::TestCase
++  fixtures :jobs
++
++  def setup
++    @controller = JobsController.new
++    @request    = ActionController::TestRequest.new
++    @response   = ActionController::TestResponse.new
++  end
++
++  def test_index
++    get :index
++    assert_response :success
++    assert_template 'list'
++  end
++
++  def test_list
++    get :list
++
++    assert_response :success
++    assert_template 'list'
++
++    assert_not_nil assigns(:jobs)
++  end
++
++  def test_show
++    get :show, :id =&gt; 1
++
++    assert_response :success
++    assert_template 'show'
++
++    assert_not_nil assigns(:job)
++    assert assigns(:job).valid?
++  end
++
++  def test_new
++    get :new
++
++    assert_response :success
++    assert_template 'new'
++
++    assert_not_nil assigns(:job)
++  end
++
++  def test_create
++    num_jobs = Job.count
++
++    post :create, :job =&gt; {}
++
++    assert_response :redirect
++    assert_redirected_to :action =&gt; 'list'
++
++    assert_equal num_jobs + 1, Job.count
++  end
++
++  def test_edit
++    get :edit, :id =&gt; 1
++
++    assert_response :success
++    assert_template 'edit'
++
++    assert_not_nil assigns(:job)
++    assert assigns(:job).valid?
++  end
++
++  def test_update
++    post :update, :id =&gt; 1
++    assert_response :redirect
++    assert_redirected_to :action =&gt; 'show', :id =&gt; 1
++  end
++
++  def test_destroy
++    assert_not_nil Job.find(1)
++
++    post :destroy, :id =&gt; 1
++    assert_response :redirect
++    assert_redirected_to :action =&gt; 'list'
++
++    assert_raise(ActiveRecord::RecordNotFound) {
++      Job.find(1)
++    }
++  end
++end
+
+
+Property changes on: trunk/human.r/test/functional/jobs_controller_test.rb
+___________________________________________________________________
+Name: svn:keywords
+   + Id
+
+Added: trunk/human.r/test/functional/locations_controller_test.rb
+===================================================================
+--- trunk/human.r/test/functional/locations_controller_test.rb	2006-08-07 13:29:00 UTC (rev 22)
++++ trunk/human.r/test/functional/locations_controller_test.rb	2006-08-07 14:38:20 UTC (rev 23)
+@@ -0,0 +1,88 @@
++require File.dirname(__FILE__) + '/../test_helper'
++require 'locations_controller'
++
++# Re-raise errors caught by the controller.
++class LocationsController; def rescue_action(e) raise e end; end
++
++class LocationsControllerTest &lt; Test::Unit::TestCase
++  fixtures :locations
++
++  def setup
++    @controller = LocationsController.new
++    @request    = ActionController::TestRequest.new
++    @response   = ActionController::TestResponse.new
++  end
++
++  def test_index
++    get :index
++    assert_response :success
++    assert_template 'list'
++  end
++
++  def test_list
++    get :list
++
++    assert_response :success
++    assert_template 'list'
++
++    assert_not_nil assigns(:locations)
++  end
++
++  def test_show
++    get :show, :id =&gt; 1
++
++    assert_response :success
++    assert_template 'show'
++
++    assert_not_nil assigns(:location)
++    assert assigns(:location).valid?
++  end
++
++  def test_new
++    get :new
++
++    assert_response :success
++    assert_template 'new'
++
++    assert_not_nil assigns(:location)
++  end
++
++  def test_create
++    num_locations = Location.count
++
++    post :create, :location =&gt; {}
++
++    assert_response :redirect
++    assert_redirected_to :action =&gt; 'list'
++
++    assert_equal num_locations + 1, Location.count
++  end
++
++  def test_edit
++    get :edit, :id =&gt; 1
++
++    assert_response :success
++    assert_template 'edit'
++
++    assert_not_nil assigns(:location)
++    assert assigns(:location).valid?
++  end
++
++  def test_update
++    post :update, :id =&gt; 1
++    assert_response :redirect
++    assert_redirected_to :action =&gt; 'show', :id =&gt; 1
++  end
++
++  def test_destroy
++    assert_not_nil Location.find(1)
++
++    post :destroy, :id =&gt; 1
++    assert_response :redirect
++    assert_redirected_to :action =&gt; 'list'
++
++    assert_raise(ActiveRecord::RecordNotFound) {
++      Location.find(1)
++    }
++  end
++end
+
+
+Property changes on: trunk/human.r/test/functional/locations_controller_test.rb
+___________________________________________________________________
+Name: svn:keywords
+   + Id
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000013.html">[Rwd-svn] r22 - trunk/human.r
+</A></li>
+	<LI>Next message: <A HREF="000014.html">[Rwd-svn] r24 - trunk/human.r
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#16">[ date ]</a>
+              <a href="thread.html#16">[ thread ]</a>
+              <a href="subject.html#16">[ subject ]</a>
+              <a href="author.html#16">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/rwd-svn">More information about the Rwd-svn
+mailing list</a><br>
+</body></html>

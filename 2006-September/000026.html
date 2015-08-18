@@ -1,0 +1,181 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Rwd-svn] r35 - exp/aurelian
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/rwd-svn/2006-September/index.html" >
+   <LINK REL="made" HREF="mailto:rwd-svn%40lists.berlios.de?Subject=Re%3A%20%5BRwd-svn%5D%20r35%20-%20exp/aurelian&In-Reply-To=%3C200609011515.k81FFPF4032188%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   
+   <LINK REL="Next"  HREF="000027.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Rwd-svn] r35 - exp/aurelian</H1>
+    <B>rwd-svn at lists.berlios.de</B> 
+    <A HREF="mailto:rwd-svn%40lists.berlios.de?Subject=Re%3A%20%5BRwd-svn%5D%20r35%20-%20exp/aurelian&In-Reply-To=%3C200609011515.k81FFPF4032188%40sheep.berlios.de%3E"
+       TITLE="[Rwd-svn] r35 - exp/aurelian">rwd-svn at lists.berlios.de
+       </A><BR>
+    <I>Fri Sep  1 17:15:25 CEST 2006</I>
+    <P><UL>
+        
+        <LI>Next message: <A HREF="000027.html">[Rwd-svn] r36 - in exp/aurelian: . Operatr
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#26">[ date ]</a>
+              <a href="thread.html#26">[ thread ]</a>
+              <a href="subject.html#26">[ subject ]</a>
+              <a href="author.html#26">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: aurelian
+Date: 2006-09-01 17:15:24 +0200 (Fri, 01 Sep 2006)
+New Revision: 35
+
+Added:
+   exp/aurelian/my.cnf
+Log:
+ MySQL optimization sample.
+
+Added: exp/aurelian/my.cnf
+===================================================================
+--- exp/aurelian/my.cnf	2006-08-28 14:55:37 UTC (rev 34)
++++ exp/aurelian/my.cnf	2006-09-01 15:15:24 UTC (rev 35)
+@@ -0,0 +1,101 @@
++#
++# $Id$
++#
++
++# The following options will be passed to all MySQL clients
++[client]
++port   = 3306
++socket = /tmp/mysql.sock
++
++# Here follows entries for some specific programs
++# The MySQL server
++[mysqld]
++# Skip 
++#  -&gt; Engines that we are not going to use
++#  -&gt; networking (connection only from localhost allowed
++#  -&gt; locking
++skip-locking
++skip-bdb
++skip-ndbcluster
++skip-networking
++# Default port, socket and connection
++port		= 3306
++socket		= /tmp/mysql.sock
++max_connections = 400
++
++#
++# MySQL READ optimisations
++#
++
++# The key buffer stores database indexes in memory.
++# sum of all indexes
++key_buffer = 64M # memory cache of the indexes
++max_allowed_packet = 2M
++# The table cache tells MySQL how many tables it can have open at any one time. 
++# In SQL queries, several tables are typically joined. 
++# The rule of thumb is that you should multiply the maximum number of 
++# connections by the maximum number of tables used in joins. 
++# For example, if the maximum number of connections is set to 400, 
++# the table cache should be at least 400 * 10. 
++# The configuration setting below shows a table cache of 200 (HUB has 16 tables):
++table_cache = 200 # ++
++# MySQL sorts results before they are returned.
++# This is per connection, so at 400 concurent open connections
++# it will take 400*2RAM
++sort_buffer_size = 2M
++read_buffer_size = 2M
++read_rnd_buffer_size = 2M
++myisam_sort_buffer_size = 16M
++
++# net_buffer_length = 16K
++
++# Activate query caching
++query-cache-type = 1
++# Memory globally available for query caches
++# It should be incresead for large dataabses
++query-cache-size = 64M # ++
++# Max size each cached query
++# If the query result is larger than the query cache limit, 
++# the results will not be cached.
++query_cache_limit = 1M
++
++#
++# MySQL WRITE optimizations (InnoDB)
++#
++
++# Change /wwwdata to where you keep mysql databases
++innodb_data_home_dir = /wwwroot/data/
++innodb_data_file_path = ibdata1:100M;ibdata2:100M:autoextend
++innodb_log_group_home_dir = /wwwroot/data/
++innodb_log_arch_dir = /wwwroot/data/
++# You can set .._buffer_pool_size up to 50 - 80 %
++# of RAM but beware of setting memory usage too high
++innodb_buffer_pool_size = 128M # ++ (more reads from memory, less I/O)
++innodb_additional_mem_pool_size = 16M # ++
++# Set .._log_file_size to 25 % of buffer pool size
++innodb_log_file_size = 32M
++innodb_log_buffer_size = 4M
++innodb_flush_log_at_trx_commit = 0 # change to 1 if you expect server crashes!!!
++# innodb_lock_wait_timeout = 50
++
++[mysqldump]
++quick
++max_allowed_packet = 16M
++
++[mysql]
++no-auto-rehash
++
++[isamchk]
++key_buffer = 20M
++sort_buffer_size = 20M
++read_buffer = 2M
++write_buffer = 2M
++
++[myisamchk]
++key_buffer = 20M
++sort_buffer_size = 20M
++read_buffer = 2M
++write_buffer = 2M
++
++[mysqlhotcopy]
++interactive-timeout
+
+
+Property changes on: exp/aurelian/my.cnf
+___________________________________________________________________
+Name: svn:keywords
+   + Id
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	
+	<LI>Next message: <A HREF="000027.html">[Rwd-svn] r36 - in exp/aurelian: . Operatr
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#26">[ date ]</a>
+              <a href="thread.html#26">[ thread ]</a>
+              <a href="subject.html#26">[ subject ]</a>
+              <a href="author.html#26">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/rwd-svn">More information about the Rwd-svn
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,305 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Rwd-svn] r36 - in exp/aurelian: . Operatr
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/rwd-svn/2006-September/index.html" >
+   <LINK REL="made" HREF="mailto:rwd-svn%40lists.berlios.de?Subject=Re%3A%20%5BRwd-svn%5D%20r36%20-%20in%20exp/aurelian%3A%20.%20Operatr&In-Reply-To=%3C200609011740.k81HeUlQ028350%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000026.html">
+   
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Rwd-svn] r36 - in exp/aurelian: . Operatr</H1>
+    <B>rwd-svn at lists.berlios.de</B> 
+    <A HREF="mailto:rwd-svn%40lists.berlios.de?Subject=Re%3A%20%5BRwd-svn%5D%20r36%20-%20in%20exp/aurelian%3A%20.%20Operatr&In-Reply-To=%3C200609011740.k81HeUlQ028350%40sheep.berlios.de%3E"
+       TITLE="[Rwd-svn] r36 - in exp/aurelian: . Operatr">rwd-svn at lists.berlios.de
+       </A><BR>
+    <I>Fri Sep  1 19:40:30 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000026.html">[Rwd-svn] r35 - exp/aurelian
+</A></li>
+        
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#27">[ date ]</a>
+              <a href="thread.html#27">[ thread ]</a>
+              <a href="subject.html#27">[ subject ]</a>
+              <a href="author.html#27">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: aurelian
+Date: 2006-09-01 19:40:29 +0200 (Fri, 01 Sep 2006)
+New Revision: 36
+
+Added:
+   exp/aurelian/Operatr/
+   exp/aurelian/Operatr/operatr-0.1.c
+   exp/aurelian/Operatr/operatr.c
+Log:
+ initial operatr
+
+Added: exp/aurelian/Operatr/operatr-0.1.c
+===================================================================
+--- exp/aurelian/Operatr/operatr-0.1.c	2006-09-01 15:15:24 UTC (rev 35)
++++ exp/aurelian/Operatr/operatr-0.1.c	2006-09-01 17:40:29 UTC (rev 36)
+@@ -0,0 +1,79 @@
++//
++// $Id$
++//
++// gcc -o operatr operatr
++//
++#include &lt;stdio.h&gt;
++#include &lt;stdlib.h&gt;
++#include &lt;sys/types.h&gt; 
++#include &lt;sys/socket.h&gt;
++#include &lt;netinet/in.h&gt;
++#include &lt;netdb.h&gt;
++#include &lt;string.h&gt;
++
++#define TRUE  1
++#define FALSE 0
++
++#define HTTP_PORT 80
++
++void error(char *message)
++{
++    perror(message);
++    exit(1);
++}
++
++int main(int argc, char *argv[])
++{
++    int sockfd;
++    char s[200];
++    char old_line[200];
++    char request[300];
++    FILE *fp;
++    struct sockaddr_in serv_addr;
++    struct hostent *server;
++    int opt= TRUE;
++    
++    // server:
++    server = gethostbyname(argv[1]);
++    if (server == NULL) {
++        fprintf(stderr,&quot;ERROR, no such host\n&quot;);
++        exit(0);
++    }
++    
++    // socket:
++    sockfd = socket(PF_INET, SOCK_STREAM, 0);
++    // sockfd = socket ( PF_INET, SOCK_RAW, IPPROTO_RAW );
++    if (sockfd &lt; 0) {
++        error(&quot;ERROR opening socket&quot;);
++    }
++    // socket options:
++    // setsockopt(sockfd,SOL_SOCKET,SO_REUSEADDR, (char *)&amp;opt,sizeof(opt));
++    // setsockopt(sockfd, IPPROTO_IP, IP_HDRINCL, (char *)&amp;opt,sizeof(opt));
++    
++    // connect:
++    serv_addr.sin_family = AF_INET;
++    bcopy((char *)server-&gt;h_addr, (char *)&amp;serv_addr.sin_addr.s_addr, server-&gt;h_length);
++    serv_addr.sin_port = htons(HTTP_PORT);
++    
++    if (connect(sockfd, (struct sockaddr *)&amp;serv_addr, sizeof(serv_addr)) &lt; 0) {
++        error(&quot;ERROR connecting&quot;);
++    }
++
++    // file descriptor
++    fp = fdopen(sockfd, &quot;r+&quot;);
++    // fillin the request:
++    sprintf(request, &quot;GET / HTTP/1.1\r\nHost: %s\r\nUser-Agent: Operatr/0.1 [%s-%s]\r\nReferer: %s\r\n\r\n&quot;, 
++                     argv[1],__DATE__,__TIME__,
++                     &quot;<A HREF="http://www.example.org">http://www.example.org</A>&quot;);
++    // send request:
++    fprintf(fp, request);
++    printf( request );
++    // ensure it got out
++    fflush(fp);
++    // response:
++    // while ( fgets(s, sizeof(s), fp) != 0 ) {
++    //     fputs(s, stdout);
++    // }
++    fclose(fp);
++}
++
+
+
+Property changes on: exp/aurelian/Operatr/operatr-0.1.c
+___________________________________________________________________
+Name: svn:keywords
+   + Id
+
+Added: exp/aurelian/Operatr/operatr.c
+===================================================================
+--- exp/aurelian/Operatr/operatr.c	2006-09-01 15:15:24 UTC (rev 35)
++++ exp/aurelian/Operatr/operatr.c	2006-09-01 17:40:29 UTC (rev 36)
+@@ -0,0 +1,132 @@
++//
++// $Id$
++//
++// gcc -o operatr operatr.c
++//
++#include &lt;stdio.h&gt;
++#include &lt;stdlib.h&gt;
++#include &lt;sys/types.h&gt; 
++#include &lt;sys/socket.h&gt;
++#include &lt;netinet/in.h&gt;
++#include &lt;netinet/ip.h&gt;
++#include &lt;netinet/tcp.h&gt;
++#include &lt;netdb.h&gt;
++#include &lt;string.h&gt;
++
++#define TRUE  1
++#define FALSE 0
++
++#define HTTP_PORT 80
++
++void error(char *message)
++{
++    perror(message);
++    exit(1);
++}
++
++int main(int argc, char *argv[])
++{
++    int sockfd;
++    
++    char packet[4096]; /* Datagram */
++    
++    char s[200];
++    char request[300];
++    FILE *fp;
++    struct sockaddr_in serv_addr;
++    struct hostent *server;
++    int opt= TRUE;
++    
++    struct iphdr *ip = (struct iphdr *) packet;
++    struct tcphdr *tcp = (struct tcphdr *) packet + sizeof(struct iphdr);
++    
++    // server:
++    server = gethostbyname(argv[1]);
++    if (server == NULL) {
++        fprintf(stderr,&quot;ERROR, no such host\n&quot;);
++        exit(0);
++    }
++    
++    // socket:
++    sockfd = socket(AF_INET, SOCK_RAW, IPPROTO_TCP);
++    // sockfd = socket ( PF_INET, SOCK_RAW, IPPROTO_RAW );
++    if (sockfd &lt; 0) {
++        error(&quot;ERROR opening socket&quot;);
++    }
++
++    // socket options:
++    // setsockopt(sockfd,SOL_SOCKET,SO_REUSEADDR, (char *)&amp;opt,sizeof(opt));
++    setsockopt(sockfd, IPPROTO_IP, IP_HDRINCL, (char *)&amp;opt,sizeof(opt));
++    
++    // connect:
++    serv_addr.sin_family = AF_INET;
++    bcopy((char *)server-&gt;h_addr, (char *)&amp;serv_addr.sin_addr.s_addr, server-&gt;h_length);
++    serv_addr.sin_port = htons ( HTTP_PORT );
++    
++    // Fill in IP headers.
++    ip-&gt;ihl = 5;
++    ip-&gt;version = 4;
++    ip-&gt;tot_len = sizeof(struct iphdr) + sizeof(struct tcphdr);
++    ip-&gt;id = htons(1337);
++    ip-&gt;saddr = inet_addr(&quot;27.90.90.191&quot;);
++    ip-&gt;daddr = inet_ntoa(serv_addr.sin_addr);
++    ip-&gt;ttl = 255;
++    ip-&gt;protocol = 6;
++    ip-&gt;check = 0;
++    ip-&gt;tos = 0;
++    ip-&gt;frag_off = 0;
++
++    // Fill in TCP headers.
++    tcp-&gt;source = htons(1337);
++    tcp-&gt;dest = htons(HTTP_PORT);
++    tcp-&gt;seq = htons(random());
++    tcp-&gt;ack = 0;
++    tcp-&gt;syn = 1;
++    tcp-&gt;window = htons(65535);
++    tcp-&gt;check = 0;
++    tcp-&gt;doff = 5;
++    tcp-&gt;rst = 0;
++    tcp-&gt;psh = 0;
++    tcp-&gt;fin = 0;
++    tcp-&gt;urg = 0;
++    tcp-&gt;ack_seq = htons(0);
++    
++    
++    // if ( connect ( sockfd, (struct sockaddr *)&amp;serv_addr, sizeof ( serv_addr ) ) &lt; 0 ) {
++    //      error ( &quot;ERROR connecting&quot; );
++    // }
++
++    // file descriptor
++    // fp = fdopen ( sockfd, &quot;r+&quot; );
++    // fillin the request:
++    // sprintf ( request, &quot;GET / HTTP/1.1\r\nHost: %s\r\nUser-Agent: Operatr/0.1 [%s-%s]\r\nReferer: %s\r\n\r\n&quot;, 
++    //                    argv[1], __DATE__,__TIME__,
++    //                    &quot;<A HREF="http://bezna.org">http://bezna.org</A>&quot; );
++    // send request:
++    // fprintf(fp, request);
++    // printf(request);
++    // ensure it got out
++    // fflush (fp);
++    // response:
++    // while (fgets(s, sizeof(s), fp) != 0) {
++    //       fputs(s, stdout);
++    // }
++    // fclose( fp );
++
++    // send( sockfd, request, sizeof( request ), 0 );
++    
++    if (sendto(sockfd, packet, ip-&gt;tot_len, 0, (struct sockaddr *)&amp;serv_addr, sizeof(serv_addr)) &lt; 0 ) {
++        error(&quot;ERROR Sending&quot;);
++    }
++    
++    close( sockfd );
++    
++    /*
++    if (send(sockfd, argv[1], strlen(argv[1])+1, 0) &lt; 0) {
++        error(&quot;ERROR Sending&quot;);
++    }
++    */
++    
++    // printf(&quot;Hello Socket!\n&quot;);
++}
++
+
+
+Property changes on: exp/aurelian/Operatr/operatr.c
+___________________________________________________________________
+Name: svn:keywords
+   + Id
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000026.html">[Rwd-svn] r35 - exp/aurelian
+</A></li>
+	
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#27">[ date ]</a>
+              <a href="thread.html#27">[ thread ]</a>
+              <a href="subject.html#27">[ subject ]</a>
+              <a href="author.html#27">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/rwd-svn">More information about the Rwd-svn
+mailing list</a><br>
+</body></html>

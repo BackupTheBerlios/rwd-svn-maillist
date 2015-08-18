@@ -1,0 +1,139 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Rwd-svn] r28 - in trunk/human.r: . app/models
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/rwd-svn/2006-August/index.html" >
+   <LINK REL="made" HREF="mailto:rwd-svn%40lists.berlios.de?Subject=Re%3A%20%5BRwd-svn%5D%20r28%20-%20in%20trunk/human.r%3A%20.%20app/models&In-Reply-To=%3C200608172022.k7HKMJ0F013995%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000018.html">
+   <LINK REL="Next"  HREF="000020.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Rwd-svn] r28 - in trunk/human.r: . app/models</H1>
+    <B>rwd-svn at lists.berlios.de</B> 
+    <A HREF="mailto:rwd-svn%40lists.berlios.de?Subject=Re%3A%20%5BRwd-svn%5D%20r28%20-%20in%20trunk/human.r%3A%20.%20app/models&In-Reply-To=%3C200608172022.k7HKMJ0F013995%40sheep.berlios.de%3E"
+       TITLE="[Rwd-svn] r28 - in trunk/human.r: . app/models">rwd-svn at lists.berlios.de
+       </A><BR>
+    <I>Thu Aug 17 22:22:19 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000018.html">[Rwd-svn] r27 - in trunk/human.r/app: controllers views/layouts
+</A></li>
+        <LI>Next message: <A HREF="000020.html">[Rwd-svn] r29 - in trunk/human.r/public: images images/src	stylesheets
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#19">[ date ]</a>
+              <a href="thread.html#19">[ thread ]</a>
+              <a href="subject.html#19">[ subject ]</a>
+              <a href="author.html#19">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: aurelian
+Date: 2006-08-17 22:22:18 +0200 (Thu, 17 Aug 2006)
+New Revision: 28
+
+Modified:
+   trunk/human.r/README
+   trunk/human.r/app/models/employee.rb
+   trunk/human.r/app/models/job.rb
+Log:
+ -- blah
+
+Modified: trunk/human.r/README
+===================================================================
+--- trunk/human.r/README	2006-08-17 11:51:03 UTC (rev 27)
++++ trunk/human.r/README	2006-08-17 20:22:18 UTC (rev 28)
+@@ -11,8 +11,7 @@
+ 
+ Preq:
+ 
+-  Ruby (1.8.4)
+-  Rails (1.1.4)
++  Ruby (www.ruby-lang.org), Rails (www.rubyonrails.com)
+   Database server supported by Rails
+ 
+ Install:
+
+Modified: trunk/human.r/app/models/employee.rb
+===================================================================
+--- trunk/human.r/app/models/employee.rb	2006-08-17 11:51:03 UTC (rev 27)
++++ trunk/human.r/app/models/employee.rb	2006-08-17 20:22:18 UTC (rev 28)
+@@ -5,18 +5,17 @@
+   belongs_to :department
+   belongs_to :job
+ 
++  def to_s
++    first_name + ' ' + last_name    
++  end
++  
+   protected
+ 
+     validates_uniqueness_of :email
++    validates_inclusion_of :salary, :within=&gt; 200..999999
++    validates_presence_of :last_name, :first_name, :email
+     validates_length_of :commission, :maximum =&gt; 2
+-    validates_numericality_of :salary
+ 
+-    validates_each :salary do | record, name, value |
+-      if value &amp;&amp; (value &lt; 0 || value &gt; 999999)
+-        record.errors.add name, &quot;Salary should be a positive number, maximum is 999999!&quot;
+-      end
+-    end
+-
+     validate :commission_percent
+ 
+   private
+
+Modified: trunk/human.r/app/models/job.rb
+===================================================================
+--- trunk/human.r/app/models/job.rb	2006-08-17 11:51:03 UTC (rev 27)
++++ trunk/human.r/app/models/job.rb	2006-08-17 20:22:18 UTC (rev 28)
+@@ -6,13 +6,11 @@
+ 
+   protected
+     validates_uniqueness_of :title
+-    validates_presence_of :title
+-    validates_numericality_of :min_salary, :only_integer =&gt; true
+-    validates_numericality_of :max_salary, :only_integer =&gt; true
++    validates_presence_of :title, :min_salary, :max_salary
+    
+     validates_each :min_salary, :max_salary do | record, name, value |
+-      if value &amp;&amp; (value &lt; 0 || value &gt; 999999)
+-        record.errors.add name, &quot;Salary should be a positive number, maximum allowed is 999999!&quot;
++      if (value &amp;&amp; (value.to_s =~ /^[+-]?\d+$/)) &amp;&amp; (value.to_i &lt; 0 || value.to_i &gt; 999999)
++        record.errors.add name, &quot;should be a positive number, [0-999999]!&quot;
+       end
+     end
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000018.html">[Rwd-svn] r27 - in trunk/human.r/app: controllers views/layouts
+</A></li>
+	<LI>Next message: <A HREF="000020.html">[Rwd-svn] r29 - in trunk/human.r/public: images images/src	stylesheets
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#19">[ date ]</a>
+              <a href="thread.html#19">[ thread ]</a>
+              <a href="subject.html#19">[ subject ]</a>
+              <a href="author.html#19">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/rwd-svn">More information about the Rwd-svn
+mailing list</a><br>
+</body></html>

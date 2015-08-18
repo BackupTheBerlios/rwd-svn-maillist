@@ -1,0 +1,134 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Rwd-svn] r7 - in trunk/shop: conf public scripts
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/rwd-svn/2006-April/index.html" >
+   <LINK REL="made" HREF="mailto:rwd-svn%40lists.berlios.de?Subject=Re%3A%20%5BRwd-svn%5D%20r7%20-%20in%20trunk/shop%3A%20conf%20public%20scripts&In-Reply-To=%3C200604160836.k3G8aPfc017585%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   
+   <LINK REL="Next"  HREF="000001.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Rwd-svn] r7 - in trunk/shop: conf public scripts</H1>
+    <B>aurelian at BerliOS</B> 
+    <A HREF="mailto:rwd-svn%40lists.berlios.de?Subject=Re%3A%20%5BRwd-svn%5D%20r7%20-%20in%20trunk/shop%3A%20conf%20public%20scripts&In-Reply-To=%3C200604160836.k3G8aPfc017585%40sheep.berlios.de%3E"
+       TITLE="[Rwd-svn] r7 - in trunk/shop: conf public scripts">aurelian at berlios.de
+       </A><BR>
+    <I>Sun Apr 16 10:36:25 CEST 2006</I>
+    <P><UL>
+        
+        <LI>Next message: <A HREF="000001.html">[Rwd-svn] r8 - in trunk: . medickart
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#0">[ date ]</a>
+              <a href="thread.html#0">[ thread ]</a>
+              <a href="subject.html#0">[ subject ]</a>
+              <a href="author.html#0">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: aurelian
+Date: 2006-04-16 10:36:24 +0200 (Sun, 16 Apr 2006)
+New Revision: 7
+
+Modified:
+   trunk/shop/conf/shop.xml
+   trunk/shop/public/index.php
+   trunk/shop/scripts/generator.php
+Log:
+ -- still alive, regenerated using svn version of medick
+
+Modified: trunk/shop/conf/shop.xml
+===================================================================
+--- trunk/shop/conf/shop.xml	2006-03-30 09:29:51 UTC (rev 6)
++++ trunk/shop/conf/shop.xml	2006-04-16 08:36:24 UTC (rev 7)
+@@ -14,6 +14,23 @@
+             &lt;server_name&gt;<A HREF="http://localhost&lt;/server_name">http://localhost&lt;/server_name</A>&gt;
+             &lt;document_root&gt;/shop&lt;/document_root&gt;
+             &lt;rewrite&gt;on&lt;/rewrite&gt;
++            &lt;!-- Session Container
++            Only CreoleSessionContainer is available.
++            It needs a database table:
++            === start ===
++            create table c_sessions (
++                `session_id`   VARCHAR (255) PRIMARY KEY,
++                `session_data` TEXT,
++                `session_lastmodified` DATETIME
++            );
++            ===  end  ===
++            NOTE: this was tested only on mysql driver
++            NOTE: to implement your own session container (handler), see ISessionContainer inteface
++            === end comment here ===
++            &lt;session&gt;
++                &lt;container&gt;action.controller.session.CreoleSessionContainer&lt;/container&gt;
++            &lt;/session&gt;
++            --&gt;
+         &lt;/web&gt;
+         &lt;!-- logger system --&gt;
+         &lt;logger&gt;
+
+Modified: trunk/shop/public/index.php
+===================================================================
+--- trunk/shop/public/index.php	2006-03-30 09:29:51 UTC (rev 6)
++++ trunk/shop/public/index.php	2006-04-16 08:36:24 UTC (rev 7)
+@@ -3,7 +3,7 @@
+ 
+ // 
+ // This file is part of shop project
+-// auto-generated on 2006 Mar 19 00:16:26 with medick version: 0.2.2-svn
++// auto-generated on 2006 Apr 16 11:13:18 with medick version: 0.2.3-svn
+ // 
+ 
+ // complete path to medick boot.php file.
+
+Modified: trunk/shop/scripts/generator.php
+===================================================================
+--- trunk/shop/scripts/generator.php	2006-03-30 09:29:51 UTC (rev 6)
++++ trunk/shop/scripts/generator.php	2006-04-16 08:36:24 UTC (rev 7)
+@@ -20,13 +20,13 @@
+     default:
+         exit(main_banner($argv[0]));
+ }  
+-exit (&quot;\nMedick (\$v: 0.2.2-svn) [ DONE ].\n&quot;);
++exit (&quot;\nMedick (\$v: 0.2.3-svn) [ DONE ].\n&quot;);
+ // }}}
+ 
+ // {{{ main_banner
+ function main_banner($script_name) {
+     $buffer =&lt;&lt;&lt;EOBANNER
+-Medick Generator 0.2.2-svn 
++Medick Generator 0.2.3-svn 
+ (c) 2005-2006 Oancea Aurelian, see LICENSE file for copyright details.
+  
+      Use one of controller or model:
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	
+	<LI>Next message: <A HREF="000001.html">[Rwd-svn] r8 - in trunk: . medickart
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#0">[ date ]</a>
+              <a href="thread.html#0">[ thread ]</a>
+              <a href="subject.html#0">[ subject ]</a>
+              <a href="author.html#0">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/rwd-svn">More information about the Rwd-svn
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,116 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Rwd-svn] r37 - exp/aurelian
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/rwd-svn/2008-June/index.html" >
+   <LINK REL="made" HREF="mailto:rwd-svn%40lists.berlios.de?Subject=Re%3A%20%5BRwd-svn%5D%20r37%20-%20exp/aurelian&In-Reply-To=%3C200806291002.m5TA2Ldk020504%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   
+   
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Rwd-svn] r37 - exp/aurelian</H1>
+    <B>rwd-svn at lists.berlios.de</B> 
+    <A HREF="mailto:rwd-svn%40lists.berlios.de?Subject=Re%3A%20%5BRwd-svn%5D%20r37%20-%20exp/aurelian&In-Reply-To=%3C200806291002.m5TA2Ldk020504%40sheep.berlios.de%3E"
+       TITLE="[Rwd-svn] r37 - exp/aurelian">rwd-svn at lists.berlios.de
+       </A><BR>
+    <I>Sun Jun 29 12:02:21 CEST 2008</I>
+    <P><UL>
+        
+        
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#28">[ date ]</a>
+              <a href="thread.html#28">[ thread ]</a>
+              <a href="subject.html#28">[ subject ]</a>
+              <a href="author.html#28">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: aurelian
+Date: 2008-06-29 12:02:21 +0200 (Sun, 29 Jun 2008)
+New Revision: 37
+
+Added:
+   exp/aurelian/traffic-0.2.rb
+Log:
+ -- some stuff
+
+Added: exp/aurelian/traffic-0.2.rb
+===================================================================
+--- exp/aurelian/traffic-0.2.rb	2006-09-01 17:40:29 UTC (rev 36)
++++ exp/aurelian/traffic-0.2.rb	2008-06-29 10:02:21 UTC (rev 37)
+@@ -0,0 +1,38 @@
++#!/usr/bin/ruby
++require 'rubygems'
++require 'hpricot'
++require 'open-uri'
++require 'csv'
++
++if ARGV[0].nil?
++  print &quot;Usage:\n\ttraffic-0.2.rb URL\n&quot;
++  exit
++end
++
++url = ARGV[0].to_s
++print &quot;===&gt; Analizing traffic from #{url}\n&quot;
++doc = Hpricot(URI.parse(url).read)
++
++filename = doc.search(&quot;//title&quot;)[0].innerText.split(&quot; - &quot;)[0].to_s + &quot;.csv&quot;
++print &quot;===&gt; Data will be saved to #{filename}\n&quot;
++
++writer = CSV.generate(filename)
++writer &lt;&lt; [&quot;luna&quot;, &quot;vizite&quot;, &quot;afisari&quot;]
++
++doc.search(&quot;//div/center/table/tr/td/table/tr/td/table:eq(1)/tr[@align='right']&quot;).each { | e |
++  i = 0; 
++  r = []; 
++  e.children.each { | c |
++    next if c.is_a?(Hpricot::Text) or c.innerText==&quot;&quot; or i &gt; 2
++    r &lt;&lt; c.innerText.gsub('.','')
++    i = i + 1
++  }
++  writer &lt;&lt; r
++  print &quot;.&quot;
++}
++
++writer.close
++
++print &quot;\n===&gt; Done.\n&quot;
++
++
+
+
+Property changes on: exp/aurelian/traffic-0.2.rb
+___________________________________________________________________
+Name: svn:executable
+   + *
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	
+	
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#28">[ date ]</a>
+              <a href="thread.html#28">[ thread ]</a>
+              <a href="subject.html#28">[ subject ]</a>
+              <a href="author.html#28">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/rwd-svn">More information about the Rwd-svn
+mailing list</a><br>
+</body></html>

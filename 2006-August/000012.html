@@ -1,0 +1,272 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Rwd-svn] r21 - trunk/human.r
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/rwd-svn/2006-August/index.html" >
+   <LINK REL="made" HREF="mailto:rwd-svn%40lists.berlios.de?Subject=Re%3A%20%5BRwd-svn%5D%20r21%20-%20trunk/human.r&In-Reply-To=%3C200608071328.k77DSEe9007778%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000011.html">
+   <LINK REL="Next"  HREF="000013.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Rwd-svn] r21 - trunk/human.r</H1>
+    <B>rwd-svn at lists.berlios.de</B> 
+    <A HREF="mailto:rwd-svn%40lists.berlios.de?Subject=Re%3A%20%5BRwd-svn%5D%20r21%20-%20trunk/human.r&In-Reply-To=%3C200608071328.k77DSEe9007778%40sheep.berlios.de%3E"
+       TITLE="[Rwd-svn] r21 - trunk/human.r">rwd-svn at lists.berlios.de
+       </A><BR>
+    <I>Mon Aug  7 15:28:14 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000011.html">[Rwd-svn] r20 - in trunk/human.r: log tmp
+</A></li>
+        <LI>Next message: <A HREF="000013.html">[Rwd-svn] r22 - trunk/human.r
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#12">[ date ]</a>
+              <a href="thread.html#12">[ thread ]</a>
+              <a href="subject.html#12">[ subject ]</a>
+              <a href="author.html#12">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: aurelian
+Date: 2006-08-07 15:28:12 +0200 (Mon, 07 Aug 2006)
+New Revision: 21
+
+Modified:
+   trunk/human.r/README
+Log:
+ -- definitii
+
+Modified: trunk/human.r/README
+===================================================================
+--- trunk/human.r/README	2006-08-07 13:21:58 UTC (rev 20)
++++ trunk/human.r/README	2006-08-07 13:28:12 UTC (rev 21)
+@@ -1,180 +1,26 @@
+-== Welcome to Rails
++# $Id: $
+ 
+-Rails is a web-application and persistence framework that includes everything
+-needed to create database-backed web-applications according to the
+-Model-View-Control pattern of separation. This pattern splits the view (also
+-called the presentation) into &quot;dumb&quot; templates that are primarily responsible
+-for inserting pre-built data in between HTML tags. The model contains the
+-&quot;smart&quot; domain objects (such as Account, Product, Person, Post) that holds all
+-the business logic and knows how to persist themselves to a database. The
+-controller handles the incoming requests (such as Save New Account, Update
+-Product, Show Post) by manipulating the model and directing data to the view.
++HUMAN.R a Rails pet-project
++~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ 
+-In Rails, the model is handled by what's called an object-relational mapping
+-layer entitled Active Record. This layer allows you to present the data from
+-database rows as objects and embellish these data objects with business logic
+-methods. You can read more about Active Record in 
+-link:files/vendor/rails/activerecord/README.html.
++What:
+ 
+-The controller and view are handled by the Action Pack, which handles both
+-layers by its two parts: Action View and Action Controller. These two layers
+-are bundled in a single package due to their heavy interdependence. This is
+-unlike the relationship between the Active Record and Action Pack that is much
+-more separate. Each of these packages can be used independently outside of
+-Rails.  You can read more about Action Pack in 
+-link:files/vendor/rails/actionpack/README.html.
++  Human Resources Rails Pet-Project
+ 
++Preq:
+ 
+-== Getting started
++  Ruby (1.8.4)
++  Rails (1.1.4)
++  Database server supported by Rails
+ 
+-1. Start the web server: &lt;tt&gt;ruby script/server&lt;/tt&gt; (run with --help for options)
+-2. Go to <A HREF="http://localhost:3000/">http://localhost:3000/</A> and get &quot;Welcome aboard: You&#8217;re riding the Rails!&quot;
+-3. Follow the guidelines to start developing your application
++Install:
+ 
++  $ cp config/database.yml.sample config/database.yml
++edit config/database.yml to match your database connection settings.
++  $ rake migrate
++  $ script/server
+ 
+-== Web servers
++Questions:
+ 
+-Rails uses the built-in web server in Ruby called WEBrick by default, so you don't
+-have to install or configure anything to play around. 
++  aurelian[at]locknet[dot]ro
+ 
+-If you have lighttpd installed, though, it'll be used instead when running script/server.
+-It's considerably faster than WEBrick and suited for production use, but requires additional
+-installation and currently only works well on OS X/Unix (Windows users are encouraged
+-to start with WEBrick). We recommend version 1.4.11 and higher. You can download it from
+-<A HREF="http://www.lighttpd.net.">http://www.lighttpd.net.</A>
+-
+-If you want something that's halfway between WEBrick and lighttpd, we heartily recommend
+-Mongrel. It's a Ruby-based web server with a C-component (so it requires compilation) that
+-also works very well with Windows. See more at <A HREF="http://mongrel.rubyforge.org/.">http://mongrel.rubyforge.org/.</A>
+-
+-But of course its also possible to run Rails with the premiere open source web server Apache.
+-To get decent performance, though, you'll need to install FastCGI. For Apache 1.3, you want
+-to use mod_fastcgi. For Apache 2.0+, you want to use mod_fcgid.
+-
+-See <A HREF="http://wiki.rubyonrails.com/rails/pages/FastCGI">http://wiki.rubyonrails.com/rails/pages/FastCGI</A> for more information on FastCGI.
+-
+-== Example for Apache conf
+-
+-  &lt;VirtualHost *:80&gt;
+-    ServerName rails
+-    DocumentRoot /path/application/public/
+-    ErrorLog /path/application/log/server.log
+-  
+-    &lt;Directory /path/application/public/&gt;
+-      Options ExecCGI FollowSymLinks
+-      AllowOverride all
+-      Allow from all
+-      Order allow,deny
+-    &lt;/Directory&gt;
+-  &lt;/VirtualHost&gt;
+-
+-NOTE: Be sure that CGIs can be executed in that directory as well. So ExecCGI
+-should be on and &quot;.cgi&quot; should respond. All requests from 127.0.0.1 go
+-through CGI, so no Apache restart is necessary for changes. All other requests
+-go through FCGI (or mod_ruby), which requires a restart to show changes.
+-
+-
+-== Debugging Rails
+-
+-Have &quot;tail -f&quot; commands running on both the server.log, production.log, and
+-test.log files. Rails will automatically display debugging and runtime
+-information to these files. Debugging info will also be shown in the browser
+-on requests from 127.0.0.1.
+-
+-
+-== Breakpoints
+-
+-Breakpoint support is available through the script/breakpointer client. This
+-means that you can break out of execution at any point in the code, investigate
+-and change the model, AND then resume execution! Example:
+-
+-  class WeblogController &lt; ActionController::Base
+-    def index
+-      @posts = Post.find_all
+-      breakpoint &quot;Breaking out from the list&quot;
+-    end
+-  end
+-  
+-So the controller will accept the action, run the first line, then present you
+-with a IRB prompt in the breakpointer window. Here you can do things like:
+-
+-Executing breakpoint &quot;Breaking out from the list&quot; at .../webrick_server.rb:16 in 'breakpoint'
+-
+-  &gt;&gt; @posts.inspect
+-  =&gt; &quot;[#&lt;Post:0x14a6be8 @attributes={\&quot;title\&quot;=&gt;nil, \&quot;body\&quot;=&gt;nil, \&quot;id\&quot;=&gt;\&quot;1\&quot;}&gt;, 
+-       #&lt;Post:0x14a6620 @attributes={\&quot;title\&quot;=&gt;\&quot;Rails you know!\&quot;, \&quot;body\&quot;=&gt;\&quot;Only ten..\&quot;, \&quot;id\&quot;=&gt;\&quot;2\&quot;}&gt;]&quot;
+-  &gt;&gt; @posts.first.title = &quot;hello from a breakpoint&quot;
+-  =&gt; &quot;hello from a breakpoint&quot;
+-
+-...and even better is that you can examine how your runtime objects actually work:
+-
+-  &gt;&gt; f = @posts.first 
+-  =&gt; #&lt;Post:0x13630c4 @attributes={&quot;title&quot;=&gt;nil, &quot;body&quot;=&gt;nil, &quot;id&quot;=&gt;&quot;1&quot;}&gt;
+-  &gt;&gt; f.
+-  Display all 152 possibilities? (y or n)
+-
+-Finally, when you're ready to resume execution, you press CTRL-D
+-
+-
+-== Console
+-
+-You can interact with the domain model by starting the console through script/console. 
+-Here you'll have all parts of the application configured, just like it is when the
+-application is running. You can inspect domain models, change values, and save to the
+-database. Starting the script without arguments will launch it in the development environment.
+-Passing an argument will specify a different environment, like &lt;tt&gt;script/console production&lt;/tt&gt;.
+-
+-
+-== Description of contents
+-
+-app
+-  Holds all the code that's specific to this particular application.
+-
+-app/controllers
+-  Holds controllers that should be named like weblog_controller.rb for
+-  automated URL mapping. All controllers should descend from
+-  ActionController::Base.
+-
+-app/models
+-  Holds models that should be named like post.rb.
+-  Most models will descend from ActiveRecord::Base.
+-  
+-app/views
+-  Holds the template files for the view that should be named like
+-  weblog/index.rhtml for the WeblogController#index action. All views use eRuby
+-  syntax. This directory can also be used to keep stylesheets, images, and so on
+-  that can be symlinked to public.
+-  
+-app/helpers
+-  Holds view helpers that should be named like weblog_helper.rb.
+-
+-app/apis
+-  Holds API classes for web services.
+-
+-config
+-  Configuration files for the Rails environment, the routing map, the database, and other dependencies.
+-
+-components
+-  Self-contained mini-applications that can bundle together controllers, models, and views.
+-
+-db
+-  Contains the database schema in schema.rb.  db/migrate contains all
+-  the sequence of Migrations for your schema.
+-
+-lib
+-  Application specific libraries. Basically, any kind of custom code that doesn't
+-  belong under controllers, models, or helpers. This directory is in the load path.
+-    
+-public
+-  The directory available for the web server. Contains subdirectories for images, stylesheets,
+-  and javascripts. Also contains the dispatchers and the default HTML files.
+-
+-script
+-  Helper scripts for automation and generation.
+-
+-test
+-  Unit and functional tests along with fixtures.
+-
+-vendor
+-  External libraries that the application depends on. Also includes the plugins subdirectory.
+-  This directory is in the load path.
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000011.html">[Rwd-svn] r20 - in trunk/human.r: log tmp
+</A></li>
+	<LI>Next message: <A HREF="000013.html">[Rwd-svn] r22 - trunk/human.r
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#12">[ date ]</a>
+              <a href="thread.html#12">[ thread ]</a>
+              <a href="subject.html#12">[ subject ]</a>
+              <a href="author.html#12">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/rwd-svn">More information about the Rwd-svn
+mailing list</a><br>
+</body></html>

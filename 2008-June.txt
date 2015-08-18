@@ -1,0 +1,67 @@
+From rwd-svn at lists.berlios.de  Sun Jun 29 12:02:21 2008
+From: rwd-svn at lists.berlios.de (rwd-svn at lists.berlios.de)
+Date: Sun, 29 Jun 2008 12:02:21 +0200
+Subject: [Rwd-svn] r37 - exp/aurelian
+Message-ID: <200806291002.m5TA2Ldk020504@sheep.berlios.de>
+
+Author: aurelian
+Date: 2008-06-29 12:02:21 +0200 (Sun, 29 Jun 2008)
+New Revision: 37
+
+Added:
+   exp/aurelian/traffic-0.2.rb
+Log:
+ -- some stuff
+
+Added: exp/aurelian/traffic-0.2.rb
+===================================================================
+--- exp/aurelian/traffic-0.2.rb	2006-09-01 17:40:29 UTC (rev 36)
++++ exp/aurelian/traffic-0.2.rb	2008-06-29 10:02:21 UTC (rev 37)
+@@ -0,0 +1,38 @@
++#!/usr/bin/ruby
++require 'rubygems'
++require 'hpricot'
++require 'open-uri'
++require 'csv'
++
++if ARGV[0].nil?
++  print "Usage:\n\ttraffic-0.2.rb URL\n"
++  exit
++end
++
++url = ARGV[0].to_s
++print "===> Analizing traffic from #{url}\n"
++doc = Hpricot(URI.parse(url).read)
++
++filename = doc.search("//title")[0].innerText.split(" - ")[0].to_s + ".csv"
++print "===> Data will be saved to #{filename}\n"
++
++writer = CSV.generate(filename)
++writer << ["luna", "vizite", "afisari"]
++
++doc.search("//div/center/table/tr/td/table/tr/td/table:eq(1)/tr[@align='right']").each { | e |
++  i = 0; 
++  r = []; 
++  e.children.each { | c |
++    next if c.is_a?(Hpricot::Text) or c.innerText=="" or i > 2
++    r << c.innerText.gsub('.','')
++    i = i + 1
++  }
++  writer << r
++  print "."
++}
++
++writer.close
++
++print "\n===> Done.\n"
++
++
+
+
+Property changes on: exp/aurelian/traffic-0.2.rb
+___________________________________________________________________
+Name: svn:executable
+   + *
+
+
+

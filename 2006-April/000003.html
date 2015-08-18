@@ -1,0 +1,320 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Rwd-svn] r11 - in trunk/medickart: conf db
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/rwd-svn/2006-April/index.html" >
+   <LINK REL="made" HREF="mailto:rwd-svn%40lists.berlios.de?Subject=Re%3A%20%5BRwd-svn%5D%20r11%20-%20in%20trunk/medickart%3A%20conf%20db&In-Reply-To=%3C200604160955.k3G9tctv029832%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000002.html">
+   <LINK REL="Next"  HREF="000004.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Rwd-svn] r11 - in trunk/medickart: conf db</H1>
+    <B>rwd-svn-admin at lists.berlios.de</B> 
+    <A HREF="mailto:rwd-svn%40lists.berlios.de?Subject=Re%3A%20%5BRwd-svn%5D%20r11%20-%20in%20trunk/medickart%3A%20conf%20db&In-Reply-To=%3C200604160955.k3G9tctv029832%40sheep.berlios.de%3E"
+       TITLE="[Rwd-svn] r11 - in trunk/medickart: conf db">rwd-svn-admin at lists.berlios.de
+       </A><BR>
+    <I>Sun Apr 16 11:55:38 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000002.html">[Rwd-svn] r9 - in trunk/medickart/public: images javascript
+</A></li>
+        <LI>Next message: <A HREF="000004.html">[Rwd-svn] r12 - trunk/medickart/db
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#3">[ date ]</a>
+              <a href="thread.html#3">[ thread ]</a>
+              <a href="subject.html#3">[ subject ]</a>
+              <a href="author.html#3">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: aurelian
+Date: 2006-04-16 11:55:38 +0200 (Sun, 16 Apr 2006)
+New Revision: 11
+
+Modified:
+   trunk/medickart/conf/medickart.routes.php
+   trunk/medickart/conf/medickart.xml
+   trunk/medickart/db/schema.sql
+Log:
+ -- more on the rename + pimped db/schema.sql
+
+Modified: trunk/medickart/conf/medickart.routes.php
+===================================================================
+--- trunk/medickart/conf/medickart.routes.php	2006-04-16 09:51:12 UTC (rev 10)
++++ trunk/medickart/conf/medickart.routes.php	2006-04-16 09:55:38 UTC (rev 11)
+@@ -1,7 +1,5 @@
+ &lt;?php
+-// routes.php
+ // $Id$
+-// @TODO: write some documentation about this file
+ 
+ $map= Map::getInstance();
+ $map-&gt;add(new Route(':controller/:action/:id'));
+
+Modified: trunk/medickart/conf/medickart.xml
+===================================================================
+--- trunk/medickart/conf/medickart.xml	2006-04-16 09:51:12 UTC (rev 10)
++++ trunk/medickart/conf/medickart.xml	2006-04-16 09:55:38 UTC (rev 11)
+@@ -2,17 +2,17 @@
+ &lt;!-- 
+  ! $Id$
+  ! --&gt;
+-&lt;application name=&quot;shop&quot;&gt;
++&lt;application name=&quot;medickart&quot;&gt;
+     &lt;!-- localhost environment --&gt;
+-    &lt;environment name=&quot;localhost&quot;&gt;
++    &lt;environment name=&quot;gremlin&quot;&gt;
+         &lt;!-- general properties --&gt;
+         &lt;properties&gt;
+-            &lt;path&gt;/wwwroot/rwd/trunk/shop&lt;/path&gt;
++            &lt;path&gt;/wwwroot/rwd/trunk/medickart&lt;/path&gt;
+         &lt;/properties&gt;
+         &lt;!-- web context --&gt;
+         &lt;web&gt;
+             &lt;server_name&gt;<A HREF="http://localhost&lt;/server_name">http://localhost&lt;/server_name</A>&gt;
+-            &lt;document_root&gt;/shop&lt;/document_root&gt;
++            &lt;document_root&gt;/medickart&lt;/document_root&gt;
+             &lt;rewrite&gt;on&lt;/rewrite&gt;
+             &lt;!-- Session Container
+             Only CreoleSessionContainer is available.
+@@ -37,7 +37,7 @@
+             &lt;formatter&gt;simple&lt;/formatter&gt;
+             &lt;outputters&gt;
+                 &lt;outputter name=&quot;file&quot; level=&quot;0&quot;&gt;
+-                    &lt;property name=&quot;path&quot; value=&quot;/wwwroot/rwd/trunk/shop/log/shop.log&quot; /&gt;
++                    &lt;property name=&quot;path&quot; value=&quot;/wwwroot/rwd/trunk/medickart/log/medickart.log&quot; /&gt;
+                 &lt;/outputter&gt;
+                 &lt;!-- &lt;outputter name=&quot;stdout&quot; level=&quot;0&quot; /&gt; --&gt;
+                 &lt;outputter name=&quot;mail&quot; level=&quot;3&quot;&gt;
+@@ -51,14 +51,14 @@
+             &lt;dsn id = &quot;one&quot;
+                  phptype  = &quot;mysql&quot;
+                  hostspec = &quot;localhost&quot;
+-                 database = &quot;shop&quot;
++                 database = &quot;medickart&quot;
+                  username = &quot;root&quot;
+-                 password = &quot;&quot; /&gt;
++                 password = &quot;virus&quot; /&gt;
+         &lt;/database&gt;
+     &lt;/environment&gt;
+ 
+     &lt;!-- a sample test environment --&gt;
+-    &lt;environment name=&quot;test&quot;&gt;
++    &lt;environment name=&quot;filip&quot;&gt;
+         &lt;!-- general properties --&gt;
+         &lt;properties&gt;
+             &lt;path&gt;/wwwroot/rwd/trunk/shop&lt;/path&gt;
+@@ -92,4 +92,4 @@
+     &lt;/environment&gt;
+   
+ &lt;/application&gt;
+-  
++
+
+Modified: trunk/medickart/db/schema.sql
+===================================================================
+--- trunk/medickart/db/schema.sql	2006-04-16 09:51:12 UTC (rev 10)
++++ trunk/medickart/db/schema.sql	2006-04-16 09:55:38 UTC (rev 11)
+@@ -1,15 +1,16 @@
+--- phpMyAdmin SQL Dump
+--- version 2.8.0.2
+--- <A HREF="http://www.phpmyadmin.net">http://www.phpmyadmin.net</A>
++--
++-- $Id: $
+ -- 
+--- Host: localhost
+--- Generation Time: Mar 18, 2006 at 05:05 AM
+--- Server version: 4.1.16
+--- PHP Version: 5.1.2
++-- Database Schema for `medickart`, mysql version
+ -- 
+--- Database: `medickart`
+--- 
+ 
++SET AUTOCOMMIT=0;
++START TRANSACTION;
++
++DROP DATABASE IF EXISTS `medickart`;
++CREATE DATABASE `medickart`;
++USE `medickart`;
++
+ -- --------------------------------------------------------
+ 
+ -- 
+@@ -21,13 +22,8 @@
+   `first_name` varchar(100) NOT NULL default '',
+   `last_name` varchar(100) NOT NULL default '',
+   PRIMARY KEY  (`id`)
+-) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
++) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+ 
+--- 
+--- Dumping data for table `authors`
+--- 
+-
+-
+ -- --------------------------------------------------------
+ 
+ -- 
+@@ -38,13 +34,8 @@
+   `id` int(10) unsigned NOT NULL auto_increment,
+   `product_id` int(10) unsigned NOT NULL default '0',
+   PRIMARY KEY  (`id`)
+-) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
++) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+ 
+--- 
+--- Dumping data for table `bestsellers`
+--- 
+-
+-
+ -- --------------------------------------------------------
+ 
+ -- 
+@@ -57,13 +48,8 @@
+   `title` varchar(100) NOT NULL default '',
+   PRIMARY KEY  (`id`),
+   KEY `parent_id` (`parent_id`,`title`)
+-) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
++) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+ 
+--- 
+--- Dumping data for table `categories`
+--- 
+-
+-
+ -- --------------------------------------------------------
+ 
+ -- 
+@@ -77,13 +63,8 @@
+   `product_price` float NOT NULL default '0',
+   `ordered_quantity` smallint(6) NOT NULL default '0',
+   PRIMARY KEY  (`id`)
+-) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
++) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+ 
+--- 
+--- Dumping data for table `order_details`
+--- 
+-
+-
+ -- --------------------------------------------------------
+ 
+ -- 
+@@ -104,13 +85,8 @@
+   `www` varchar(60) NOT NULL default '',
+   `created_on` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+   PRIMARY KEY  (`id`)
+-) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
++) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+ 
+--- 
+--- Dumping data for table `orders`
+--- 
+-
+-
+ -- --------------------------------------------------------
+ 
+ -- 
+@@ -134,13 +110,8 @@
+   `updated_on` timestamp NOT NULL default '0000-00-00 00:00:00',
+   PRIMARY KEY  (`id`),
+   KEY `title` (`title`)
+-) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
++) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+ 
+--- 
+--- Dumping data for table `products`
+--- 
+-
+-
+ -- --------------------------------------------------------
+ 
+ -- 
+@@ -152,13 +123,8 @@
+   `product_id` int(10) unsigned NOT NULL default '0',
+   `author_id` int(10) unsigned NOT NULL default '0',
+   PRIMARY KEY  (`id`)
+-) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
++) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+ 
+--- 
+--- Dumping data for table `products_authors`
+--- 
+-
+-
+ -- --------------------------------------------------------
+ 
+ -- 
+@@ -171,27 +137,23 @@
+   `description` text NOT NULL,
+   PRIMARY KEY  (`id`),
+   KEY `title` (`title`)
+-) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
++) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+ 
+--- 
+--- Dumping data for table `publishers`
+--- 
+-
+-
+ -- --------------------------------------------------------
+ 
+ -- 
+--- Table structure for table `users`
+--- 
++-- {{{ Table structure for table `users`
+ 
+ CREATE TABLE `users` (
+-  `id` int(10) unsigned NOT NULL auto_increment,
+-  `username` varchar(16) NOT NULL default '',
+-  `password` varchar(32) NOT NULL default '',
++  `id`          INT     ( 10 )  unsigned NOT NULL auto_increment,
++  `username`    VARCHAR ( 255 )          NOT NULL,
++  `password`    VARCHAR ( 32 )           NOT NULL,
++  `email`       VARCHAR ( 255 )          NOT NULL,
++  `last_login`  TIMESTAMP                NOT NULL default CURRENT_TIMESTAMP,
+   PRIMARY KEY  (`id`)
+-) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
++) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+ 
+--- 
+--- Dumping data for table `users`
+--- 
++-- }}} --------------------------------------------------------
+ 
++COMMIT;
++
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000002.html">[Rwd-svn] r9 - in trunk/medickart/public: images javascript
+</A></li>
+	<LI>Next message: <A HREF="000004.html">[Rwd-svn] r12 - trunk/medickart/db
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#3">[ date ]</a>
+              <a href="thread.html#3">[ thread ]</a>
+              <a href="subject.html#3">[ subject ]</a>
+              <a href="author.html#3">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/rwd-svn">More information about the Rwd-svn
+mailing list</a><br>
+</body></html>

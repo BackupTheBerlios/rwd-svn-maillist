@@ -1,0 +1,454 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Rwd-svn] r13 - in trunk/medickart: app/controllers app/helpers app/views app/views/admin app/views/layouts app/views/users public public/stylesheet scripts
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/rwd-svn/2006-April/index.html" >
+   <LINK REL="made" HREF="mailto:rwd-svn%40lists.berlios.de?Subject=Re%3A%20%5BRwd-svn%5D%20r13%20-%20in%20trunk/medickart%3A%20app/controllers%20app/helpers%20app/views%20app/views/admin%20app/views/layouts%20app/views/users%20public%20public/stylesheet%20scripts&In-Reply-To=%3C200604161334.k3GDY0KM011954%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000004.html">
+   <LINK REL="Next"  HREF="000006.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Rwd-svn] r13 - in trunk/medickart: app/controllers app/helpers app/views app/views/admin app/views/layouts app/views/users public public/stylesheet scripts</H1>
+    <B>rwd-svn-admin at lists.berlios.de</B> 
+    <A HREF="mailto:rwd-svn%40lists.berlios.de?Subject=Re%3A%20%5BRwd-svn%5D%20r13%20-%20in%20trunk/medickart%3A%20app/controllers%20app/helpers%20app/views%20app/views/admin%20app/views/layouts%20app/views/users%20public%20public/stylesheet%20scripts&In-Reply-To=%3C200604161334.k3GDY0KM011954%40sheep.berlios.de%3E"
+       TITLE="[Rwd-svn] r13 - in trunk/medickart: app/controllers app/helpers app/views app/views/admin app/views/layouts app/views/users public public/stylesheet scripts">rwd-svn-admin at lists.berlios.de
+       </A><BR>
+    <I>Sun Apr 16 15:34:00 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000004.html">[Rwd-svn] r12 - trunk/medickart/db
+</A></li>
+        <LI>Next message: <A HREF="000006.html">[Rwd-svn] r14 - in trunk/medickart: app/controllers app/helpers app/models app/views/layouts app/views/users db public/stylesheet
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#5">[ date ]</a>
+              <a href="thread.html#5">[ thread ]</a>
+              <a href="subject.html#5">[ subject ]</a>
+              <a href="author.html#5">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: aurelian
+Date: 2006-04-16 15:33:46 +0200 (Sun, 16 Apr 2006)
+New Revision: 13
+
+Added:
+   trunk/medickart/app/controllers/admin_controller.php
+   trunk/medickart/app/controllers/users_controller.php
+   trunk/medickart/app/helpers/admin_helper.php
+   trunk/medickart/app/helpers/users_helper.php
+   trunk/medickart/app/views/admin/
+   trunk/medickart/app/views/admin/index.phtml
+   trunk/medickart/app/views/layouts/admin.phtml
+   trunk/medickart/app/views/users/
+   trunk/medickart/app/views/users/add.phtml
+   trunk/medickart/app/views/users/edit.phtml
+   trunk/medickart/app/views/users/index.phtml
+   trunk/medickart/public/stylesheet/medickart.css
+Removed:
+   trunk/medickart/public/stylesheet/medick.css
+Modified:
+   trunk/medickart/app/controllers/application.php
+   trunk/medickart/public/index.php
+   trunk/medickart/scripts/generator.php
+Log:
+ -- more files and layout
+
+Added: trunk/medickart/app/controllers/admin_controller.php
+===================================================================
+--- trunk/medickart/app/controllers/admin_controller.php	2006-04-16 09:59:58 UTC (rev 12)
++++ trunk/medickart/app/controllers/admin_controller.php	2006-04-16 13:33:46 UTC (rev 13)
+@@ -0,0 +1,15 @@
++&lt;?php
++/**
++ * This class is part of medickart project
++ * 
++ * @package controllers.medickart
++ *
++ * $Id$
++ */
++class AdminController extends ApplicationController {
++    
++    protected $before_filter= array('authenticate');
++    
++    public function index() {    }
++    
++}
+
+
+Property changes on: trunk/medickart/app/controllers/admin_controller.php
+___________________________________________________________________
+Name: svn:keywords
+   + Id
+
+Modified: trunk/medickart/app/controllers/application.php
+===================================================================
+--- trunk/medickart/app/controllers/application.php	2006-04-16 09:59:58 UTC (rev 12)
++++ trunk/medickart/app/controllers/application.php	2006-04-16 13:33:46 UTC (rev 13)
+@@ -1,12 +1,16 @@
+ &lt;?php
++/**
++ * This class is part of medickart project
++ *
++ * Methods added here will be available in all your controllers.
++ * $Id$
++ * @package medickart.controllers
++ */
++class ApplicationController extends ActionController {
+ 
+-  /**
+-   * This class is part of shop project
+-   *
+-   * Methods added here will be available in all your controllers.
+-   * $Id$
+-   * @package shop.controllers
+-   */
+-  class ApplicationController extends ActionController {
++    protected function authenticate() {
++        return TRUE;
++    }
++    
++}
+ 
+-  }
+
+Added: trunk/medickart/app/controllers/users_controller.php
+===================================================================
+--- trunk/medickart/app/controllers/users_controller.php	2006-04-16 09:59:58 UTC (rev 12)
++++ trunk/medickart/app/controllers/users_controller.php	2006-04-16 13:33:46 UTC (rev 13)
+@@ -0,0 +1,47 @@
++&lt;?php
++/**
++ * This class is part of medickart project
++ * 
++ * Managementul utilizatorilor, (CRUD ptr. `users`)
++ * 
++ * $Id$
++ * @package medickart.controllers
++ */ 
++class UsersController extends ApplicationController {
++
++    protected $before_filters= array('authenticate');
++
++    protected $use_layout= 'admin';
++    
++    /**
++     * Afiseaza toti utilizatori din sistem
++     */ 
++    public function index() {    }
++
++    /**
++     * Afiseaza formularul ptr. adaugarea unui nou utilizator
++     */ 
++	public function add() {    }
++
++    /**
++     * Salveaza un nou utilizator in baza de date
++     */ 
++    public function create() {    }
++
++    /**
++     * Afizeaza formularul pentru editarea unui utilizator
++     */ 
++	public function edit() {    }
++
++    /**
++     * Actualizeaza un utilizator in baza de date
++     */ 
++	public function update() {    }
++
++    /**
++     * Sterge un utilizator din baza de date
++     */ 
++	public function delete() {    }
++
++}
++
+
+
+Property changes on: trunk/medickart/app/controllers/users_controller.php
+___________________________________________________________________
+Name: svn:keywords
+   + Id
+
+Added: trunk/medickart/app/helpers/admin_helper.php
+===================================================================
+
+
+Property changes on: trunk/medickart/app/helpers/admin_helper.php
+___________________________________________________________________
+Name: svn:keywords
+   + Id
+
+Added: trunk/medickart/app/helpers/users_helper.php
+===================================================================
+
+
+Property changes on: trunk/medickart/app/helpers/users_helper.php
+___________________________________________________________________
+Name: svn:keywords
+   + Id
+
+Added: trunk/medickart/app/views/admin/index.phtml
+===================================================================
+--- trunk/medickart/app/views/admin/index.phtml	2006-04-16 09:59:58 UTC (rev 12)
++++ trunk/medickart/app/views/admin/index.phtml	2006-04-16 13:33:46 UTC (rev 13)
+@@ -0,0 +1,3 @@
++AdminController#index
++&lt;!-- $Id$ --&gt;
++
+
+
+Property changes on: trunk/medickart/app/views/admin/index.phtml
+___________________________________________________________________
+Name: svn:keywords
+   + Id
+
+Added: trunk/medickart/app/views/layouts/admin.phtml
+===================================================================
+--- trunk/medickart/app/views/layouts/admin.phtml	2006-04-16 09:59:58 UTC (rev 12)
++++ trunk/medickart/app/views/layouts/admin.phtml	2006-04-16 13:33:46 UTC (rev 13)
+@@ -0,0 +1,27 @@
++&lt;html xmlns=&quot;<A HREF="http://www.w3.org/1999/xhtml">http://www.w3.org/1999/xhtml</A>&quot; lang=&quot;en&quot; xml:lang=&quot;en&quot;&gt;
++     &lt;head&gt;
++         &lt;title&gt;admin&lt;/title&gt;
++         &lt;base href=&quot;&lt;?=$__server;?&gt;&lt;?=$__base;?&gt;/&quot; /&gt;
++         &lt;link rel=&quot;stylesheet&quot; href=&quot;stylesheet/medickart.css&quot; /&gt;
++         &lt;meta http-equiv=&quot;Content-Type&quot; content=&quot;text/html; charset=UTF-8&quot; /&gt;
++     &lt;/head&gt;
++     &lt;body&gt;
++        &lt;div id=&quot;container&quot;&gt;
++            &lt;div id=&quot;header&quot;&gt;Admin Area&lt;/div&gt;
++            &lt;div id=&quot;sidebar&quot;&gt;
++                &lt;div class=&quot;box&quot;&gt;
++                    &lt;div class=&quot;box-heading&quot;&gt;Sectiuni&lt;/div&gt;
++                    &lt;div class=&quot;box-contents&quot;&gt;
++                        &lt;ul class=&quot;side-nav&quot;&gt;
++                            &lt;li&gt;&lt;a href=&quot;&lt;?=URL::create('admin');?&gt;&quot;&gt;Admin Home&lt;/a&gt;
++                            &lt;li&gt;&lt;a href=&quot;&lt;?=URL::create('users');?&gt;&quot;&gt;User Management&lt;/a&gt;&lt;/li&gt;
++                            &lt;li&gt;&lt;a href=&quot;&lt;?=URL::create('publishers');?&gt;&quot;&gt;Publishers&lt;/a&gt;&lt;/li&gt;
++                        &lt;/ul&gt;
++                    &lt;/div&gt;
++                &lt;/div&gt;
++            &lt;/div&gt;
++            &lt;div id=&quot;content&quot;&gt;&lt;?=$content_for_layout;?&gt;&lt;/div&gt;
++            &lt;div id=&quot;footer&quot;&gt;The footer&lt;/div&gt;
++        &lt;/div&gt;
++     &lt;/body&gt;
++&lt;/html&gt;
+
+
+Property changes on: trunk/medickart/app/views/layouts/admin.phtml
+___________________________________________________________________
+Name: svn:keywords
+   + Id
+
+Added: trunk/medickart/app/views/users/add.phtml
+===================================================================
+--- trunk/medickart/app/views/users/add.phtml	2006-04-16 09:59:58 UTC (rev 12)
++++ trunk/medickart/app/views/users/add.phtml	2006-04-16 13:33:46 UTC (rev 13)
+@@ -0,0 +1 @@
++UsersController#add
+\ No newline at end of file
+
+
+Property changes on: trunk/medickart/app/views/users/add.phtml
+___________________________________________________________________
+Name: svn:keywords
+   + Id
+
+Added: trunk/medickart/app/views/users/edit.phtml
+===================================================================
+--- trunk/medickart/app/views/users/edit.phtml	2006-04-16 09:59:58 UTC (rev 12)
++++ trunk/medickart/app/views/users/edit.phtml	2006-04-16 13:33:46 UTC (rev 13)
+@@ -0,0 +1 @@
++UsersController#edit
+\ No newline at end of file
+
+
+Property changes on: trunk/medickart/app/views/users/edit.phtml
+___________________________________________________________________
+Name: svn:keywords
+   + Id
+
+Added: trunk/medickart/app/views/users/index.phtml
+===================================================================
+--- trunk/medickart/app/views/users/index.phtml	2006-04-16 09:59:58 UTC (rev 12)
++++ trunk/medickart/app/views/users/index.phtml	2006-04-16 13:33:46 UTC (rev 13)
+@@ -0,0 +1 @@
++UsersController#index
+\ No newline at end of file
+
+
+Property changes on: trunk/medickart/app/views/users/index.phtml
+___________________________________________________________________
+Name: svn:keywords
+   + Id
+
+Modified: trunk/medickart/public/index.php
+===================================================================
+--- trunk/medickart/public/index.php	2006-04-16 09:59:58 UTC (rev 12)
++++ trunk/medickart/public/index.php	2006-04-16 13:33:46 UTC (rev 13)
+@@ -12,8 +12,8 @@
+ // and environment to load
+ $d= new Dispatcher(
+           ContextManager::load(
+-            '/wwwroot/rwd/trunk/medickart/conf/shop.xml',
+-            'localhost')
++            '/wwwroot/rwd/trunk/medickart/conf/medickart.xml',
++            'gremlin')
+         );
+ $d-&gt;dispatch();
+ 
+
+Deleted: trunk/medickart/public/stylesheet/medick.css
+===================================================================
+--- trunk/medickart/public/stylesheet/medick.css	2006-04-16 09:59:58 UTC (rev 12)
++++ trunk/medickart/public/stylesheet/medick.css	2006-04-16 13:33:46 UTC (rev 13)
+@@ -1,9 +0,0 @@
+-/* stylesheet for shop project */
+-/* $Id$ */
+-
+-body {
+-    margin: 20px;
+-    padding: 20px;
+-    border: 1px solid black;
+-    font-family:verdana, arial, helvetica, sans-serif;
+-}
+\ No newline at end of file
+
+Added: trunk/medickart/public/stylesheet/medickart.css
+===================================================================
+--- trunk/medickart/public/stylesheet/medickart.css	2006-04-16 09:59:58 UTC (rev 12)
++++ trunk/medickart/public/stylesheet/medickart.css	2006-04-16 13:33:46 UTC (rev 13)
+@@ -0,0 +1,74 @@
++/* stylesheet for shop project */
++/* $Id$ */
++
++body {
++    font:11px/1.3em verdana, arial, helvetica, sans-serif;
++}
++
++/* page layout */
++#container {
++    position:relative;
++    width: 750px;
++    margin-right:auto;
++    margin-left:auto;
++    padding: 10px;
++    background-color: #fff;
++    border: 1px solid black;
++}
++
++#header {
++    text-align: center;
++    font-size: 3em;
++    background: url(<A HREF="http://localhost/medickart/images/logo.jpg">http://localhost/medickart/images/logo.jpg</A>) no-repeat;
++    height: 40px;
++    border-bottom: 2px solid #555;
++}
++
++#content {
++    padding:20px 20px 5px 20px;
++    margin-left:200px;
++}
++
++#sidebar {
++    width:200px;
++    float: left;
++}
++
++#footer {
++    clear:both;
++    border-top:2px solid #555;
++}
++
++
++/* general */
++a,a:link,a:active {
++    color:#86c200;
++	font-weight:normal;
++	text-decoration:none;
++}
++
++a:hover {
++	font-weight:normal;
++	text-decoration:underline;
++}
++
++.box {
++
++    
++    
++}
++
++.box-heading {
++    background-color: #C24A4B;
++    color: #fff;
++    font-weight:bold;
++    font-size: 1.4em;
++    text-align: center;
++    padding: 0.8em;
++    
++}
++
++.side-nav li {
++    list-style-type:none;
++    padding:0.1em 0;
++}
+
+
+Property changes on: trunk/medickart/public/stylesheet/medickart.css
+___________________________________________________________________
+Name: svn:keywords
+   + Id
+
+Modified: trunk/medickart/scripts/generator.php
+===================================================================
+--- trunk/medickart/scripts/generator.php	2006-04-16 09:59:58 UTC (rev 12)
++++ trunk/medickart/scripts/generator.php	2006-04-16 13:33:46 UTC (rev 13)
+@@ -12,10 +12,10 @@
+   
+ switch ($type) {
+     case &quot;controller&quot;:
+-        generate_controller($name, '/wwwroot/rwd/trunk/shop');
++        generate_controller($name, '/wwwroot/rwd/trunk/medickart');
+         break;
+     case &quot;model&quot;:
+-        generate_model($name, '/wwwroot/rwd/trunk/shop');
++        generate_model($name, '/wwwroot/rwd/trunk/medickart');
+         break;
+     default:
+         exit(main_banner($argv[0]));
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000004.html">[Rwd-svn] r12 - trunk/medickart/db
+</A></li>
+	<LI>Next message: <A HREF="000006.html">[Rwd-svn] r14 - in trunk/medickart: app/controllers app/helpers app/models app/views/layouts app/views/users db public/stylesheet
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#5">[ date ]</a>
+              <a href="thread.html#5">[ thread ]</a>
+              <a href="subject.html#5">[ subject ]</a>
+              <a href="author.html#5">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/rwd-svn">More information about the Rwd-svn
+mailing list</a><br>
+</body></html>

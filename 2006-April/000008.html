@@ -1,0 +1,340 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Rwd-svn] r16 - in trunk: . medickart/app/controllers medickart/app/helpers medickart/app/models medickart/app/views/users
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/rwd-svn/2006-April/index.html" >
+   <LINK REL="made" HREF="mailto:rwd-svn%40lists.berlios.de?Subject=Re%3A%20%5BRwd-svn%5D%20r16%20-%20in%20trunk%3A%20.%20medickart/app/controllers%20medickart/app/helpers%20medickart/app/models%20medickart/app/views/users&In-Reply-To=%3C200604162037.k3GKbRR2026799%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000007.html">
+   <LINK REL="Next"  HREF="000009.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Rwd-svn] r16 - in trunk: . medickart/app/controllers medickart/app/helpers medickart/app/models medickart/app/views/users</H1>
+    <B>rwd-svn-admin at lists.berlios.de</B> 
+    <A HREF="mailto:rwd-svn%40lists.berlios.de?Subject=Re%3A%20%5BRwd-svn%5D%20r16%20-%20in%20trunk%3A%20.%20medickart/app/controllers%20medickart/app/helpers%20medickart/app/models%20medickart/app/views/users&In-Reply-To=%3C200604162037.k3GKbRR2026799%40sheep.berlios.de%3E"
+       TITLE="[Rwd-svn] r16 - in trunk: . medickart/app/controllers medickart/app/helpers medickart/app/models medickart/app/views/users">rwd-svn-admin at lists.berlios.de
+       </A><BR>
+    <I>Sun Apr 16 22:37:27 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000007.html">[Rwd-svn] r15 - trunk/medickart
+</A></li>
+        <LI>Next message: <A HREF="000009.html">[Rwd-svn] r17 - in trunk/medickart/app: controllers models views/users
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#8">[ date ]</a>
+              <a href="thread.html#8">[ thread ]</a>
+              <a href="subject.html#8">[ subject ]</a>
+              <a href="author.html#8">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: aurelian
+Date: 2006-04-16 22:37:23 +0200 (Sun, 16 Apr 2006)
+New Revision: 16
+
+Modified:
+   trunk/README
+   trunk/medickart/app/controllers/users_controller.php
+   trunk/medickart/app/helpers/users_helper.php
+   trunk/medickart/app/models/user.php
+   trunk/medickart/app/views/users/add.phtml
+   trunk/medickart/app/views/users/edit.phtml
+   trunk/medickart/app/views/users/index.phtml
+Log:
+ -- mai mult.
+
+Modified: trunk/README
+===================================================================
+--- trunk/README	2006-04-16 16:37:16 UTC (rev 15)
++++ trunk/README	2006-04-16 20:37:23 UTC (rev 16)
+@@ -1,16 +1,16 @@
+-$Id: $
++$Id$
+ 
+-Structura:
++Structura subproiectelor:
+ trunk
+     \_ nume-proiect1
+         \_ structura directoare proiect 1
+     \_ nume-proiect2
+         \_ structura directoare proiect 2
+ 
+-acces anonim:
++Acces anonim la Subversion:
+ svn checkout <A HREF="svn://svn.berlios.de/rwd/trunk/nume-proiect1">svn://svn.berlios.de/rwd/trunk/nume-proiect1</A>
+ 
+-docs:
++Subversion docs:
+ <A HREF="http://developer.berlios.de/docman/display_doc.php?docid=394&amp;group_id=2">http://developer.berlios.de/docman/display_doc.php?docid=394&amp;group_id=2</A>
+ <A HREF="http://svnbook.red-bean.com/">http://svnbook.red-bean.com/</A>
+ 
+
+Modified: trunk/medickart/app/controllers/users_controller.php
+===================================================================
+--- trunk/medickart/app/controllers/users_controller.php	2006-04-16 16:37:16 UTC (rev 15)
++++ trunk/medickart/app/controllers/users_controller.php	2006-04-16 20:37:23 UTC (rev 16)
+@@ -32,7 +32,10 @@
+      */ 
+     public function create() {
+         $this-&gt;user= new User($this-&gt;request-&gt;getParameter('user'));
++        $this-&gt;user-&gt;repass = $this-&gt;request-&gt;getParameter('repass');
+         if ($this-&gt;user-&gt;save() === FALSE) {
++            // reset passwds?
++            $this-&gt;user-&gt;repass=$this-&gt;user-&gt;pass=NULL;
+             $this-&gt;render('add');
+         } else {
+             $this-&gt;flash('notice', '&lt;em&gt;' . $this-&gt;user-&gt;name . '&lt;/em&gt; created');
+@@ -50,12 +53,39 @@
+     /**
+      * Actualizeaza un utilizator in baza de date
+      */ 
+-	public function update() {    }
++	public function update() {
++        try {
++            $this-&gt;user= User::find($this-&gt;request-&gt;getParameter('id'))-&gt;attributes($this-&gt;request-&gt;getParameter('user'));
++            if ($this-&gt;user-&gt;save() === FALSE) {
++                $this-&gt;render('edit');
++            } else {
++                $this-&gt;flash('notice', $this-&gt;user-&gt;name . ' updated');
++                $this-&gt;redirect_to('index');
++            }
++        } catch (ActiveRecordException $arEx) {
++            $this-&gt;logger-&gt;warn($arEx-&gt;getMessage());
++            $this-&gt;flash('error', $arEx-&gt;getMessage());
++            $this-&gt;redirect_to('index');
++        }
++    }
+ 
+     /**
+      * Sterge un utilizator din baza de date
+      */ 
+-	public function delete() {    }
++	public function delete() {
++        try {
++            $user= User::find($this-&gt;request-&gt;getParameter('id'));
++            if ($user-&gt;delete()===FALSE) {
++                $this-&gt;flash('error', 'Cannot delete &lt;em&gt;' . $user-&gt;name . '&lt;/em&gt;!');
++                return $this-&gt;redirect_to('index');
++            }
++            $this-&gt;flash('notice', '&lt;em&gt;' . $user-&gt;name . '&lt;/em&gt; succesfully removed');
++            $this-&gt;redirect_to('index');
++        } catch (ActiveRecordException $arEx) {
++            $this-&gt;flash('error', $arEx-&gt;getMessage());
++            $this-&gt;redirect_to('index');
++        }
++    }
+ 
+ }
+ 
+
+Modified: trunk/medickart/app/helpers/users_helper.php
+===================================================================
+--- trunk/medickart/app/helpers/users_helper.php	2006-04-16 16:37:16 UTC (rev 15)
++++ trunk/medickart/app/helpers/users_helper.php	2006-04-16 20:37:23 UTC (rev 16)
+@@ -11,6 +11,19 @@
+         return $role == User::ADMIN ? 'admin' : 'normal user';
+     }
+     
++    public static function role_to_select($role) {
++        $buff = '&lt;select name=&quot;user[role]&quot; id=&quot;user_role&quot;&gt;';
++        
++        if ($role == User::ADMIN) {
++            $buff .= '&lt;option value=&quot;'.User::ADMIN.'&quot; selected=&quot;selected&quot;&gt;Admin&lt;/option&gt;';
++            $buff .= '&lt;option value=&quot;'.User::NORMAL.'&quot;&gt;Normal User&lt;/option&gt;';
++        } elseif ($role == User::NORMAL) {
++            $buff .= '&lt;option value=&quot;'.User::ADMIN.'&quot;&gt;Admin&lt;/option&gt;';
++            $buff .= '&lt;option value=&quot;'.User::NORMAL.'&quot; selected=&quot;selected&quot;&gt;Normal User&lt;/option&gt;';
++        }
++        return $buff .= '&lt;/select&gt;';
++    }
++    
+     // de implementat.
+     // trebe sa converteasca date intr-un format mai uman
+     public static function last_login_to_human($date) {
+
+Modified: trunk/medickart/app/models/user.php
+===================================================================
+--- trunk/medickart/app/models/user.php	2006-04-16 16:37:16 UTC (rev 15)
++++ trunk/medickart/app/models/user.php	2006-04-16 20:37:23 UTC (rev 16)
+@@ -10,22 +10,33 @@
+     const ADMIN = 0;
+ 
+     const NORMAL= 1;
++ 
++    /** virtual field */
++    public $repass;
+     
+     protected function before_save() {
+         $this-&gt;validates()-&gt;presence_of('name', 'mail', 'pass');
+         $this-&gt;validates()-&gt;uniqueness_of('name', 'mail');
+         
+-        // {{{ this will go to medick core, soon :)
++        // {{ { this will go to medick core, soon :)
+         if (strlen($this-&gt;name) &lt;= 3) { // validez daca numele are cel putin 4 caractere.
+             $this-&gt;row-&gt;getFieldByName('name')-&gt;addError('should have at least 4 chars.');
+         }
+         
++        if (strlen($this-&gt;pass &lt;= 3)) { // validez daca parola are cel putin 4 caractere
++            $this-&gt;row-&gt;getFieldByName('pass')-&gt;addError('should have at least 4 chars.');
++        }
++        
+         $p = '/^([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})$/i';
+         if (!preg_match($p, $this-&gt;mail)) { // validez daca mailul are formatul corect.
+             $this-&gt;row-&gt;getFieldByName('mail')-&gt;addError('is not a valid email address');
+         }
+ 
+-        // }}}
++        if ($this-&gt;pass != $this-&gt;repass) {
++            $this-&gt;row-&gt;getFieldByName('pass')-&gt;addError('!=');
++        }
++        
++        // }} }
+ 
+         return true;
+     }
+
+Modified: trunk/medickart/app/views/users/add.phtml
+===================================================================
+--- trunk/medickart/app/views/users/add.phtml	2006-04-16 16:37:16 UTC (rev 15)
++++ trunk/medickart/app/views/users/add.phtml	2006-04-16 20:37:23 UTC (rev 16)
+@@ -24,8 +24,7 @@
+             &lt;label for=&quot;retype_password&quot;&gt;Re-Type Password:&lt;/label&gt;
+         &lt;/dt&gt;
+         &lt;dd&gt;
+-            &lt;input type=&quot;passrord&quot; name=&quot;retypedpass&quot; id=&quot;retype_password&quot; /&gt;
+-        &lt;!--&lt;?=FormHelper::password_field($user,'retypepass', array('size'=&gt;35));?&gt;--&gt;
++            &lt;input type=&quot;password&quot; name=&quot;repass&quot; id=&quot;retype_password&quot; value=&quot;&lt;?=$user-&gt;repass;?&gt;&quot; /&gt;
+         &lt;/dd&gt;
+     &lt;/dl&gt;
+ 
+@@ -41,7 +40,7 @@
+             &lt;label for=&quot;user_role&quot;&gt;Role:&lt;/label&gt;
+         &lt;/dt&gt;    
+         &lt;dd&gt;
+-            &lt;select id=&quot;user_role&quot;&gt;
++            &lt;select id=&quot;user_role&quot; name=&quot;user[role]&quot;&gt;
+                 &lt;option value=&quot;0&quot; &lt;?=$user-&gt;role===0 ? 'selected' : '' ?&gt;&gt;Admin&lt;/option&gt;
+                 &lt;option value=&quot;1&quot; &lt;?=$user-&gt;role===1 ? 'selected' : '' ?&gt;&gt;Normal User&lt;/option&gt;
+             &lt;/select&gt;
+
+Modified: trunk/medickart/app/views/users/edit.phtml
+===================================================================
+--- trunk/medickart/app/views/users/edit.phtml	2006-04-16 16:37:16 UTC (rev 15)
++++ trunk/medickart/app/views/users/edit.phtml	2006-04-16 20:37:23 UTC (rev 16)
+@@ -3,6 +3,7 @@
+   &lt;fieldset&gt;
+     &lt;legend&gt;Edit User&lt;/legend&gt;
+     &lt;?=ActiveRecordHelper::error_messages_for($user);?&gt;
++    &lt;input type=&quot;hidden&quot; name=&quot;id&quot; value=&quot;&lt;?=$user-&gt;id;?&gt;&quot; /&gt;
+     &lt;dl&gt;
+         &lt;dt&gt;&lt;label for=&quot;user_name&quot;&gt;Name:&lt;/label&gt;&lt;/dt&gt;
+         &lt;dd&gt;&lt;?=FormHelper::text_field($user, 'name', array('size'=&gt;35));?&gt;&lt;/dd&gt;
+@@ -13,23 +14,45 @@
+     &lt;/dl&gt;
+     &lt;dl&gt;
+         &lt;dt&gt;&lt;label for=&quot;user_role&quot;&gt;Role:&lt;/label&gt;&lt;/dt&gt;
+-        &lt;dd&gt;
+-            &lt;select id=&quot;user_role&quot;&gt;
++        &lt;dd&gt;&lt;?=UCHelper::role_to_select($user-&gt;role);?&gt;&lt;/dd&gt;
++        &lt;!--
++            &lt;select id=&quot;user_role&quot; name=&quot;user[role]&quot;&gt;
+                 &lt;option value=&quot;0&quot; &lt;?=$user-&gt;role===0 ? 'selected' : '' ?&gt;&gt;Admin&lt;/option&gt;
+                 &lt;option value=&quot;1&quot; &lt;?=$user-&gt;role===1 ? 'selected' : '' ?&gt;&gt;Normal User&lt;/option&gt;
+             &lt;/select&gt;
+         &lt;/dd&gt;
++        --&gt;
+     &lt;/dl&gt;
+     &lt;div&gt;&lt;?=Form::submit('submit', 'Save');?&gt;&lt;/div&gt;
+   &lt;/fieldset&gt;
+ &lt;/form&gt;
++
+ &lt;hr /&gt;
++
+ &lt;form action=&quot;&lt;?=URL::create('users', 'change_password');?&gt;&quot; method=&quot;post&quot;&gt;
+     &lt;fieldset&gt;
+         &lt;legend&gt;Change Password&lt;/legend&gt;
+-        &lt;dl&gt;&lt;dt&gt;&lt;label for=&quot;current_password&quot;&gt;Current Password: &lt;/label&gt;&lt;/dt&gt;&lt;dd&gt;&lt;input id=&quot;current_password&quot; type=&quot;password&quot; name=&quot;curent_password&quot;/&gt;&lt;/dd&gt;&lt;/dl&gt;
+-        &lt;dl&gt;&lt;dt&gt;&lt;label for=&quot;new_password&quot;&gt;New Password: &lt;/label&gt;&lt;/dt&gt;&lt;dd&gt;&lt;input id=&quot;new_password&quot; type=&quot;password&quot; name=&quot;new_password&quot;/&gt;&lt;/dd&gt;&lt;/dl&gt;
+-        &lt;dl&gt;&lt;dt&gt;&lt;label for=&quot;retype_password&quot;&gt;Re-type Password: &lt;/label&gt;&lt;/dt&gt;&lt;dd&gt;&lt;input id=&quot;retype_password&quot; type=&quot;password&quot; name=&quot;retype_password&quot;/&gt;&lt;/dd&gt;&lt;/dl&gt;
++        &lt;input type=&quot;hidden&quot; name=&quot;id&quot; value=&quot;&lt;?=$user-&gt;id;?&gt;&quot; /&gt;
++        &lt;dl&gt;
++            &lt;dt&gt;
++                &lt;label for=&quot;current_password&quot;&gt;Current Password: &lt;/label&gt;
++            &lt;/dt&gt;
++            &lt;dd&gt;
++                &lt;input id=&quot;current_password&quot; type=&quot;password&quot; name=&quot;curent_password&quot;/&gt;
++            &lt;/dd&gt;
++        &lt;/dl&gt;
++
++        &lt;dl&gt;
++            &lt;dt&gt;
++                &lt;label for=&quot;new_password&quot;&gt;New Password: &lt;/label&gt;&lt;/dt&gt;
++            &lt;dd&gt;&lt;input id=&quot;new_password&quot; type=&quot;password&quot; name=&quot;new_password&quot;/&gt;&lt;/dd&gt;
++        &lt;/dl&gt;
++        
++        &lt;dl&gt;
++            &lt;dt&gt;
++                &lt;label for=&quot;retype_password&quot;&gt;Re-type Password: &lt;/label&gt;&lt;/dt&gt;
++            &lt;dd&gt;&lt;input id=&quot;retype_password&quot; type=&quot;password&quot; name=&quot;retype_password&quot;/&gt;&lt;/dd&gt;
++        &lt;/dl&gt;
+         &lt;div&gt;&lt;?=Form::submit('submit', 'Change');?&gt;&lt;/div&gt;
+     &lt;/fieldset&gt;
+ &lt;/form&gt;
+
+Modified: trunk/medickart/app/views/users/index.phtml
+===================================================================
+--- trunk/medickart/app/views/users/index.phtml	2006-04-16 16:37:16 UTC (rev 15)
++++ trunk/medickart/app/views/users/index.phtml	2006-04-16 20:37:23 UTC (rev 16)
+@@ -1,7 +1,19 @@
+ &lt;h2&gt;UsersController#index&lt;/h2&gt;
+ 
+-&lt;!-- $Id: --&gt;
++&lt;!-- $Id$ --&gt;
+ 
++&lt;? if(isset($flash['notice'])):?&gt;
++    &lt;div class=&quot;flash_notice&quot;&gt;
++        &lt;div class=&quot;label&quot;&gt;Note&lt;/div&gt;
++        &lt;div class=&quot;content&quot;&gt;&lt;?=$flash['notice'];?&gt;&lt;/div&gt;
++    &lt;/div&gt;
++&lt;? endif;?&gt;
++&lt;? if(isset($flash['error'])):?&gt;
++    &lt;div class=&quot;flash_error&quot;&gt;
++        &lt;div class=&quot;label&quot;&gt;Warning&lt;/div&gt;
++        &lt;div class=&quot;content&quot;&gt;&lt;?=$flash['error'];?&gt;&lt;/div&gt;
++    &lt;/div&gt;
++&lt;? endif;?&gt;
+ 
+ &lt;? if ($users-&gt;size()!=0):?&gt;
+     &lt;? foreach ($users as $user): ?&gt;
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000007.html">[Rwd-svn] r15 - trunk/medickart
+</A></li>
+	<LI>Next message: <A HREF="000009.html">[Rwd-svn] r17 - in trunk/medickart/app: controllers models views/users
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#8">[ date ]</a>
+              <a href="thread.html#8">[ thread ]</a>
+              <a href="subject.html#8">[ subject ]</a>
+              <a href="author.html#8">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/rwd-svn">More information about the Rwd-svn
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,1983 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Rwd-svn] r9 - in trunk/medickart/public: images javascript
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/rwd-svn/2006-April/index.html" >
+   <LINK REL="made" HREF="mailto:rwd-svn%40lists.berlios.de?Subject=Re%3A%20%5BRwd-svn%5D%20r9%20-%20in%20trunk/medickart/public%3A%20images%20javascript&In-Reply-To=%3C200604160901.k3G915hD022616%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000001.html">
+   <LINK REL="Next"  HREF="000003.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Rwd-svn] r9 - in trunk/medickart/public: images javascript</H1>
+    <B>aurelian at BerliOS</B> 
+    <A HREF="mailto:rwd-svn%40lists.berlios.de?Subject=Re%3A%20%5BRwd-svn%5D%20r9%20-%20in%20trunk/medickart/public%3A%20images%20javascript&In-Reply-To=%3C200604160901.k3G915hD022616%40sheep.berlios.de%3E"
+       TITLE="[Rwd-svn] r9 - in trunk/medickart/public: images javascript">aurelian at berlios.de
+       </A><BR>
+    <I>Sun Apr 16 11:01:05 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000001.html">[Rwd-svn] r8 - in trunk: . medickart
+</A></li>
+        <LI>Next message: <A HREF="000003.html">[Rwd-svn] r11 - in trunk/medickart: conf db
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#2">[ date ]</a>
+              <a href="thread.html#2">[ thread ]</a>
+              <a href="subject.html#2">[ subject ]</a>
+              <a href="author.html#2">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: aurelian
+Date: 2006-04-16 11:00:36 +0200 (Sun, 16 Apr 2006)
+New Revision: 9
+
+Added:
+   trunk/medickart/public/images/logo.jpg
+Modified:
+   trunk/medickart/public/javascript/controls.js
+   trunk/medickart/public/javascript/dragdrop.js
+   trunk/medickart/public/javascript/effects.js
+   trunk/medickart/public/javascript/prototype.js
+   trunk/medickart/public/javascript/scriptaculous.js
+Log:
+-- added a nice logo for our project&quot;
+-- upgraded prototype to 1.5.0_rc0 and script.aculo.us to 1.6.1&quot;
+
+
+
+Added: trunk/medickart/public/images/logo.jpg
+===================================================================
+(Binary files differ)
+
+
+Property changes on: trunk/medickart/public/images/logo.jpg
+___________________________________________________________________
+Name: svn:mime-type
+   + application/octet-stream
+
+Modified: trunk/medickart/public/javascript/controls.js
+===================================================================
+--- trunk/medickart/public/javascript/controls.js	2006-04-16 08:40:43 UTC (rev 8)
++++ trunk/medickart/public/javascript/controls.js	2006-04-16 09:00:36 UTC (rev 9)
+@@ -141,8 +141,8 @@
+          return;
+       }
+      else 
+-      if(event.keyCode==Event.KEY_TAB || event.keyCode==Event.KEY_RETURN) 
+-        return;
++       if(event.keyCode==Event.KEY_TAB || event.keyCode==Event.KEY_RETURN || 
++         (navigator.appVersion.indexOf('AppleWebKit') &gt; 0 &amp;&amp; event.keyCode == 0)) return;
+ 
+     this.changed = true;
+     this.hasFocus = true;
+
+Modified: trunk/medickart/public/javascript/dragdrop.js
+===================================================================
+--- trunk/medickart/public/javascript/dragdrop.js	2006-04-16 08:40:43 UTC (rev 8)
++++ trunk/medickart/public/javascript/dragdrop.js	2006-04-16 09:00:36 UTC (rev 9)
+@@ -1,4 +1,5 @@
+ // Copyright (c) 2005 Thomas Fuchs (<A HREF="http://script.aculo.us,">http://script.aculo.us,</A> <A HREF="http://mir.aculo.us">http://mir.aculo.us</A>)
++//           (c) 2005 Sammi Williams (<A HREF="http://www.oriontransfer.co.nz,">http://www.oriontransfer.co.nz,</A> <A HREF="https://lists.berlios.de/mailman/listinfo/rwd-svn">sammi at oriontransfer.co.nz</A>)
+ // 
+ // See scriptaculous.js for full license.
+ 
+@@ -15,7 +16,8 @@
+     element = $(element);
+     var options = Object.extend({
+       greedy:     true,
+-      hoverclass: null  
++      hoverclass: null,
++      tree:       false
+     }, arguments[1] || {});
+ 
+     // cache containers
+@@ -37,12 +39,27 @@
+ 
+     this.drops.push(options);
+   },
++  
++  findDeepestChild: function(drops) {
++    deepest = drops[0];
++      
++    for (i = 1; i &lt; drops.length; ++i)
++      if (Element.isParent(drops[i].element, deepest.element))
++        deepest = drops[i];
++    
++    return deepest;
++  },
+ 
+   isContained: function(element, drop) {
+-    var parentNode = element.parentNode;
+-    return drop._containers.detect(function(c) { return parentNode == c });
++    var containmentNode;
++    if(drop.tree) {
++      containmentNode = element.treeNode; 
++    } else {
++      containmentNode = element.parentNode;
++    }
++    return drop._containers.detect(function(c) { return containmentNode == c });
+   },
+-
++  
+   isAffected: function(point, element, drop) {
+     return (
+       (drop.element!=element) &amp;&amp;
+@@ -68,18 +85,22 @@
+ 
+   show: function(point, element) {
+     if(!this.drops.length) return;
++    var affected = [];
+     
+     if(this.last_active) this.deactivate(this.last_active);
+     this.drops.each( function(drop) {
+-      if(Droppables.isAffected(point, element, drop)) {
+-        if(drop.onHover)
+-           drop.onHover(element, drop.element, Position.overlap(drop.overlap, drop.element));
+-        if(drop.greedy) { 
+-          Droppables.activate(drop);
+-          throw $break;
+-        }
+-      }
++      if(Droppables.isAffected(point, element, drop))
++        affected.push(drop);
+     });
++        
++    if(affected.length&gt;0) {
++      drop = Droppables.findDeepestChild(affected);
++      Position.within(drop.element, point[0], point[1]);
++      if(drop.onHover)
++        drop.onHover(element, drop.element, Position.overlap(drop.overlap, drop.element));
++      
++      Droppables.activate(drop);
++    }
+   },
+ 
+   fire: function(event, element) {
+@@ -187,15 +208,17 @@
+   initialize: function(element) {
+     var options = Object.extend({
+       handle: false,
+-      starteffect: function(element) { 
+-        new Effect.Opacity(element, {duration:0.2, from:1.0, to:0.7}); 
++      starteffect: function(element) {
++        element._opacity = Element.getOpacity(element); 
++        new Effect.Opacity(element, {duration:0.2, from:element._opacity, to:0.7}); 
+       },
+       reverteffect: function(element, top_offset, left_offset) {
+         var dur = Math.sqrt(Math.abs(top_offset^2)+Math.abs(left_offset^2))*0.02;
+         element._revert = new Effect.Move(element, { x: -left_offset, y: -top_offset, duration: dur});
+       },
+-      endeffect: function(element) { 
+-        new Effect.Opacity(element, {duration:0.2, from:0.7, to:1.0}); 
++      endeffect: function(element) {
++        var toOpacity = typeof element._opacity == 'number' ? element._opacity : 1.0
++        new Effect.Opacity(element, {duration:0.2, from:0.7, to:toOpacity}); 
+       },
+       zindex: 1000,
+       revert: false,
+@@ -207,12 +230,15 @@
+ 
+     this.element = $(element);
+     
+-    if(options.handle &amp;&amp; (typeof options.handle == 'string'))
+-      this.handle = Element.childrenWithClassName(this.element, options.handle)[0];  
++    if(options.handle &amp;&amp; (typeof options.handle == 'string')) {
++      var h = Element.childrenWithClassName(this.element, options.handle, true);
++      if(h.length&gt;0) this.handle = h[0];
++    }
+     if(!this.handle) this.handle = $(options.handle);
+     if(!this.handle) this.handle = this.element;
+     
+-    if(options.scroll) options.scroll = $(options.scroll);
++    if(options.scroll &amp;&amp; !options.scroll.scrollTo &amp;&amp; !options.scroll.outerHTML)
++      options.scroll = $(options.scroll);
+ 
+     Element.makePositioned(this.element); // fix IE    
+ 
+@@ -277,8 +303,14 @@
+     }
+     
+     if(this.options.scroll) {
+-      this.originalScrollLeft = this.options.scroll.scrollLeft;
+-      this.originalScrollTop = this.options.scroll.scrollTop;
++      if (this.options.scroll == window) {
++        var where = this._getWindowScroll(this.options.scroll);
++        this.originalScrollLeft = where.left;
++        this.originalScrollTop = where.top;
++      } else {
++        this.originalScrollLeft = this.options.scroll.scrollLeft;
++        this.originalScrollTop = this.options.scroll.scrollTop;
++      }
+     }
+     
+     Draggables.notify('onStart', this, event);
+@@ -294,13 +326,18 @@
+     if(this.options.change) this.options.change(this);
+     
+     if(this.options.scroll) {
+-      //if(this.scrollInterval) this.scroll();
+       this.stopScrolling();
+-      var p = Position.page(this.options.scroll);
+-      p[0] += this.options.scroll.scrollLeft;
+-      p[1] += this.options.scroll.scrollTop;
+-      p.push(p[0]+this.options.scroll.offsetWidth);
+-      p.push(p[1]+this.options.scroll.offsetHeight);
++      
++      var p;
++      if (this.options.scroll == window) {
++        with(this._getWindowScroll(this.options.scroll)) { p = [ left, top, left+width, top+height ]; }
++      } else {
++        p = Position.page(this.options.scroll);
++        p[0] += this.options.scroll.scrollLeft;
++        p[1] += this.options.scroll.scrollTop;
++        p.push(p[0]+this.options.scroll.offsetWidth);
++        p.push(p[1]+this.options.scroll.offsetHeight);
++      }
+       var speed = [0,0];
+       if(pointer[0] &lt; (p[0]+this.options.scrollSensitivity)) speed[0] = pointer[0]-(p[0]+this.options.scrollSensitivity);
+       if(pointer[1] &lt; (p[1]+this.options.scrollSensitivity)) speed[1] = pointer[1]-(p[1]+this.options.scrollSensitivity);
+@@ -366,7 +403,7 @@
+     var d = this.currentDelta();
+     pos[0] -= d[0]; pos[1] -= d[1];
+     
+-    if(this.options.scroll) {
++    if(this.options.scroll &amp;&amp; (this.options.scroll != window)) {
+       pos[0] -= this.options.scroll.scrollLeft-this.originalScrollLeft;
+       pos[1] -= this.options.scroll.scrollTop-this.originalScrollTop;
+     }
+@@ -377,7 +414,7 @@
+     
+     if(this.options.snap) {
+       if(typeof this.options.snap == 'function') {
+-        p = this.options.snap(p[0],p[1]);
++        p = this.options.snap(p[0],p[1],this);
+       } else {
+       if(this.options.snap instanceof Array) {
+         p = p.map( function(v, i) {
+@@ -400,6 +437,7 @@
+     if(this.scrollInterval) {
+       clearInterval(this.scrollInterval);
+       this.scrollInterval = null;
++      Draggables._lastScrollPointer = null;
+     }
+   },
+   
+@@ -413,15 +451,55 @@
+     var current = new Date();
+     var delta = current - this.lastScrolled;
+     this.lastScrolled = current;
+-    this.options.scroll.scrollLeft += this.scrollSpeed[0] * delta / 1000;
+-    this.options.scroll.scrollTop  += this.scrollSpeed[1] * delta / 1000;
++    if(this.options.scroll == window) {
++      with (this._getWindowScroll(this.options.scroll)) {
++        if (this.scrollSpeed[0] || this.scrollSpeed[1]) {
++          var d = delta / 1000;
++          this.options.scroll.scrollTo( left + d*this.scrollSpeed[0], top + d*this.scrollSpeed[1] );
++        }
++      }
++    } else {
++      this.options.scroll.scrollLeft += this.scrollSpeed[0] * delta / 1000;
++      this.options.scroll.scrollTop  += this.scrollSpeed[1] * delta / 1000;
++    }
+     
+     Position.prepare();
+     Droppables.show(Draggables._lastPointer, this.element);
+     Draggables.notify('onDrag', this);
+-    this.draw(Draggables._lastPointer);    
++    Draggables._lastScrollPointer = Draggables._lastScrollPointer || $A(Draggables._lastPointer);
++    Draggables._lastScrollPointer[0] += this.scrollSpeed[0] * delta / 1000;
++    Draggables._lastScrollPointer[1] += this.scrollSpeed[1] * delta / 1000;
++    if (Draggables._lastScrollPointer[0] &lt; 0)
++      Draggables._lastScrollPointer[0] = 0;
++    if (Draggables._lastScrollPointer[1] &lt; 0)
++      Draggables._lastScrollPointer[1] = 0;
++    this.draw(Draggables._lastScrollPointer);
+     
+     if(this.options.change) this.options.change(this);
++  },
++  
++  _getWindowScroll: function(w) {
++    var T, L, W, H;
++    with (w.document) {
++      if (w.document.documentElement &amp;&amp; documentElement.scrollTop) {
++        T = documentElement.scrollTop;
++        L = documentElement.scrollLeft;
++      } else if (w.document.body) {
++        T = body.scrollTop;
++        L = body.scrollLeft;
++      }
++      if (w.innerWidth) {
++        W = w.innerWidth;
++        H = w.innerHeight;
++      } else if (w.document.documentElement &amp;&amp; documentElement.clientWidth) {
++        W = documentElement.clientWidth;
++        H = documentElement.clientHeight;
++      } else {
++        W = body.offsetWidth;
++        H = body.offsetHeight
++      }
++    }
++    return { top: T, left: L, width: W, height: H };
+   }
+ }
+ 
+@@ -447,30 +525,41 @@
+ }
+ 
+ var Sortable = {
+-  sortables: new Array(),
++  sortables: {},
+   
+-  options: function(element){
+-    element = $(element);
+-    return this.sortables.detect(function(s) { return s.element == element });
++  _findRootElement: function(element) {
++    while (element.tagName != &quot;BODY&quot;) {  
++      if(element.id &amp;&amp; Sortable.sortables[element.id]) return element;
++      element = element.parentNode;
++    }
+   },
++
++  options: function(element) {
++    element = Sortable._findRootElement($(element));
++    if(!element) return;
++    return Sortable.sortables[element.id];
++  },
+   
+   destroy: function(element){
+-    element = $(element);
+-    this.sortables.findAll(function(s) { return s.element == element }).each(function(s){
++    var s = Sortable.options(element);
++    
++    if(s) {
+       Draggables.removeObserver(s.element);
+       s.droppables.each(function(d){ Droppables.remove(d) });
+       s.draggables.invoke('destroy');
+-    });
+-    this.sortables = this.sortables.reject(function(s) { return s.element == element });
++      
++      delete Sortable.sortables[s.element.id];
++    }
+   },
+-  
++
+   create: function(element) {
+     element = $(element);
+     var options = Object.extend({ 
+       element:     element,
+       tag:         'li',       // assumes li children, override with tag: 'tagname'
+       dropOnEmpty: false,
+-      tree:        false,      // fixme: unimplemented
++      tree:        false,
++      treeTag:     'ul',
+       overlap:     'vertical', // one of 'vertical', 'horizontal'
+       constraint:  'vertical', // one of 'vertical', 'horizontal', false
+       containment: element,    // also takes array of elements (or id's); or false
+@@ -479,6 +568,8 @@
+       hoverclass:  null,
+       ghosting:    false,
+       scroll:      false,
++      scrollSensitivity: 20,
++      scrollSpeed: 15,
+       format:      /^[^_]*_(.*)$/,
+       onChange:    Prototype.emptyFunction,
+       onUpdate:    Prototype.emptyFunction
+@@ -491,6 +582,8 @@
+     var options_for_draggable = {
+       revert:      true,
+       scroll:      options.scroll,
++      scrollSpeed: options.scrollSpeed,
++      scrollSensitivity: options.scrollSensitivity,
+       ghosting:    options.ghosting,
+       constraint:  options.constraint,
+       handle:      options.handle };
+@@ -516,10 +609,18 @@
+     var options_for_droppable = {
+       overlap:     options.overlap,
+       containment: options.containment,
++      tree:        options.tree,
+       hoverclass:  options.hoverclass,
+-      onHover:     Sortable.onHover,
+-      greedy:      !options.dropOnEmpty
++      onHover:     Sortable.onHover
++      //greedy:      !options.dropOnEmpty
+     }
++    
++    var options_for_tree = {
++      onHover:      Sortable.onEmptyHover,
++      overlap:      options.overlap,
++      containment:  options.containment,
++      hoverclass:   options.hoverclass
++    }
+ 
+     // fix for gecko engine
+     Element.cleanWhitespace(element); 
+@@ -527,12 +628,9 @@
+     options.draggables = [];
+     options.droppables = [];
+ 
+-    // make it so
+-
+     // drop on empty handling
+-    if(options.dropOnEmpty) {
+-      Droppables.add(element,
+-        {containment: options.containment, onHover: Sortable.onEmptyHover, greedy: false});
++    if(options.dropOnEmpty || options.tree) {
++      Droppables.add(element, options_for_tree);
+       options.droppables.push(element);
+     }
+ 
+@@ -543,11 +641,20 @@
+       options.draggables.push(
+         new Draggable(e, Object.extend(options_for_draggable, { handle: handle })));
+       Droppables.add(e, options_for_droppable);
++      if(options.tree) e.treeNode = element;
+       options.droppables.push(e);      
+     });
++    
++    if(options.tree) {
++      (Sortable.findTreeElements(element, options) || []).each( function(e) {
++        Droppables.add(e, options_for_tree);
++        e.treeNode = element;
++        options.droppables.push(e);
++      });
++    }
+ 
+     // keep reference
+-    this.sortables.push(options);
++    this.sortables[element.id] = options;
+ 
+     // for onupdate
+     Draggables.addObserver(new SortableObserver(element, options.onUpdate));
+@@ -556,23 +663,21 @@
+ 
+   // return all suitable-for-sortable elements in a guaranteed order
+   findElements: function(element, options) {
+-    if(!element.hasChildNodes()) return null;
+-    var elements = [];
+-    $A(element.childNodes).each( function(e) {
+-      if(e.tagName &amp;&amp; e.tagName.toUpperCase()==options.tag.toUpperCase() &amp;&amp;
+-        (!options.only || (Element.hasClassName(e, options.only))))
+-          elements.push(e);
+-      if(options.tree) {
+-        var grandchildren = this.findElements(e, options);
+-        if(grandchildren) elements.push(grandchildren);
+-      }
+-    });
+-
+-    return (elements.length&gt;0 ? elements.flatten() : null);
++    return Element.findChildren(
++      element, options.only, options.tree ? true : false, options.tag);
+   },
++  
++  findTreeElements: function(element, options) {
++    return Element.findChildren(
++      element, options.only, options.tree ? true : false, options.treeTag);
++  },
+ 
+   onHover: function(element, dropon, overlap) {
+-    if(overlap&gt;0.5) {
++    if(Element.isParent(dropon, element)) return;
++
++    if(overlap &gt; .33 &amp;&amp; overlap &lt; .66 &amp;&amp; Sortable.options(dropon).tree) {
++      return;
++    } else if(overlap&gt;0.5) {
+       Sortable.mark(dropon, 'before');
+       if(dropon.previousSibling != element) {
+         var oldParentNode = element.parentNode;
+@@ -595,13 +700,37 @@
+       }
+     }
+   },
+-
+-  onEmptyHover: function(element, dropon) {
+-    if(element.parentNode!=dropon) {
+-      var oldParentNode = element.parentNode;
+-      dropon.appendChild(element);
++  
++  onEmptyHover: function(element, dropon, overlap) {
++    var oldParentNode = element.parentNode;
++    var droponOptions = Sortable.options(dropon);
++        
++    if(!Element.isParent(dropon, element)) {
++      var index;
++      
++      var children = Sortable.findElements(dropon, {tag: droponOptions.tag});
++      var child = null;
++            
++      if(children) {
++        var offset = Element.offsetSize(dropon, droponOptions.overlap) * (1.0 - overlap);
++        
++        for (index = 0; index &lt; children.length; index += 1) {
++          if (offset - Element.offsetSize (children[index], droponOptions.overlap) &gt;= 0) {
++            offset -= Element.offsetSize (children[index], droponOptions.overlap);
++          } else if (offset - (Element.offsetSize (children[index], droponOptions.overlap) / 2) &gt;= 0) {
++            child = index + 1 &lt; children.length ? children[index + 1] : null;
++            break;
++          } else {
++            child = children[index];
++            break;
++          }
++        }
++      }
++      
++      dropon.insertBefore(element, child);
++      
+       Sortable.options(oldParentNode).onChange(element);
+-      Sortable.options(dropon).onChange(element);
++      droponOptions.onChange(element);
+     }
+   },
+ 
+@@ -633,7 +762,76 @@
+     
+     Element.show(Sortable._marker);
+   },
++  
++  _tree: function(element, options, parent) {
++    var children = Sortable.findElements(element, options) || [];
++  
++    for (var i = 0; i &lt; children.length; ++i) {
++      var match = children[i].id.match(options.format);
+ 
++      if (!match) continue;
++      
++      var child = {
++        id: encodeURIComponent(match ? match[1] : null),
++        element: element,
++        parent: parent,
++        children: new Array,
++        position: parent.children.length,
++        container: Sortable._findChildrenElement(children[i], options.treeTag.toUpperCase())
++      }
++      
++      /* Get the element containing the children and recurse over it */
++      if (child.container)
++        this._tree(child.container, options, child)
++      
++      parent.children.push (child);
++    }
++
++    return parent; 
++  },
++
++  /* Finds the first element of the given tag type within a parent element.
++    Used for finding the first LI[ST] within a L[IST]I[TEM].*/
++  _findChildrenElement: function (element, containerTag) {
++    if (element &amp;&amp; element.hasChildNodes)
++      for (var i = 0; i &lt; element.childNodes.length; ++i)
++        if (element.childNodes[i].tagName == containerTag)
++          return element.childNodes[i];
++  
++    return null;
++  },
++
++  tree: function(element) {
++    element = $(element);
++    var sortableOptions = this.options(element);
++    var options = Object.extend({
++      tag: sortableOptions.tag,
++      treeTag: sortableOptions.treeTag,
++      only: sortableOptions.only,
++      name: element.id,
++      format: sortableOptions.format
++    }, arguments[1] || {});
++    
++    var root = {
++      id: null,
++      parent: null,
++      children: new Array,
++      container: element,
++      position: 0
++    }
++    
++    return Sortable._tree (element, options, root);
++  },
++
++  /* Construct a [i] index for a particular node */
++  _constructIndex: function(node) {
++    var index = '';
++    do {
++      if (node.id) index = '[' + node.position + ']' + index;
++    } while ((node = node.parent) != null);
++    return index;
++  },
++
+   sequence: function(element) {
+     element = $(element);
+     var options = Object.extend(this.options(element), arguments[1] || {});
+@@ -655,20 +853,63 @@
+     });
+    
+     new_sequence.each(function(ident) {
+-        var n = nodeMap[ident];
+-        if (n) {
+-            n[1].appendChild(n[0]);
+-            delete nodeMap[ident];
+-        }
++      var n = nodeMap[ident];
++      if (n) {
++        n[1].appendChild(n[0]);
++        delete nodeMap[ident];
++      }
+     });
+   },
+-
++  
+   serialize: function(element) {
+     element = $(element);
++    var options = Object.extend(Sortable.options(element), arguments[1] || {});
+     var name = encodeURIComponent(
+       (arguments[1] &amp;&amp; arguments[1].name) ? arguments[1].name : element.id);
+-    return Sortable.sequence(element, arguments[1]).map( function(item) {
+-      return name + &quot;[]=&quot; + encodeURIComponent(item);
+-    }).join('&amp;');
++    
++    if (options.tree) {
++      return Sortable.tree(element, arguments[1]).children.map( function (item) {
++        return [name + Sortable._constructIndex(item) + &quot;=&quot; + 
++                encodeURIComponent(item.id)].concat(item.children.map(arguments.callee));
++      }).flatten().join('&amp;');
++    } else {
++      return Sortable.sequence(element, arguments[1]).map( function(item) {
++        return name + &quot;[]=&quot; + encodeURIComponent(item);
++      }).join('&amp;');
++    }
+   }
+ }
++
++/* Returns true if child is contained within element */
++Element.isParent = function(child, element) {
++  if (!child.parentNode || child == element) return false;
++
++  if (child.parentNode == element) return true;
++
++  return Element.isParent(child.parentNode, element);
++}
++
++Element.findChildren = function(element, only, recursive, tagName) {    
++  if(!element.hasChildNodes()) return null;
++  tagName = tagName.toUpperCase();
++  if(only) only = [only].flatten();
++  var elements = [];
++  $A(element.childNodes).each( function(e) {
++    if(e.tagName &amp;&amp; e.tagName.toUpperCase()==tagName &amp;&amp;
++      (!only || (Element.classNames(e).detect(function(v) { return only.include(v) }))))
++        elements.push(e);
++    if(recursive) {
++      var grandchildren = Element.findChildren(e, only, recursive, tagName);
++      if(grandchildren) elements.push(grandchildren);
++    }
++  });
++
++  return (elements.length&gt;0 ? elements.flatten() : []);
++}
++
++Element.offsetSize = function (element, type) {
++  if (type == 'vertical' || type == 'height')
++    return element.offsetHeight;
++  else
++    return element.offsetWidth;
++}
+\ No newline at end of file
+
+Modified: trunk/medickart/public/javascript/effects.js
+===================================================================
+--- trunk/medickart/public/javascript/effects.js	2006-04-16 08:40:43 UTC (rev 8)
++++ trunk/medickart/public/javascript/effects.js	2006-04-16 09:00:36 UTC (rev 9)
+@@ -6,8 +6,6 @@
+ // 
+ // See scriptaculous.js for full license.  
+ 
+-/* ------------- element ext -------------- */  
+- 
+ // converts rgb() and #xxx to #xxxxxx format,  
+ // returns self (or first argument) if not convertable  
+ String.prototype.parseColor = function() {  
+@@ -24,6 +22,8 @@
+   return(color.length==7 ? color : (arguments[0] || this));  
+ }
+ 
++/*--------------------------------------------------------------------------*/
++
+ Element.collectTextNodes = function(element) {  
+   return $A($(element).childNodes).collect( function(node) {
+     return (node.nodeType==3 ? node.nodeValue : 
+@@ -39,14 +39,10 @@
+   }).flatten().join('');
+ }
+ 
+-Element.setStyle = function(element, style) {
+-  element = $(element);
+-  for(k in style) element.style[k.camelize()] = style[k];
+-}
+-
+-Element.setContentZoom = function(element, percent) {  
++Element.setContentZoom = function(element, percent) {
++  element = $(element);  
+   Element.setStyle(element, {fontSize: (percent/100) + 'em'});   
+-  if(navigator.appVersion.indexOf('AppleWebKit')&gt;0) window.scrollBy(0,0);  
++  if(navigator.appVersion.indexOf('AppleWebKit')&gt;0) window.scrollBy(0,0);
+ }
+ 
+ Element.getOpacity = function(element){  
+@@ -73,18 +69,33 @@
+      Element.setStyle(element, 
+        { filter: Element.getStyle(element,'filter').replace(/alpha\([^\)]*\)/gi,'') +
+                  'alpha(opacity='+value*100+')' });  
+-  }   
++  }
+ }  
+  
+ Element.getInlineOpacity = function(element){  
+   return $(element).style.opacity || '';
+ }  
+ 
+-Element.childrenWithClassName = function(element, className) {  
+-  return $A($(element).getElementsByTagName('*')).select(
+-    function(c) { return Element.hasClassName(c, className) });
++Element.childrenWithClassName = function(element, className, findFirst) {
++  var classNameRegExp = new RegExp(&quot;(^|\\s)&quot; + className + &quot;(\\s|$)&quot;);
++  var results = $A($(element).getElementsByTagName('*'))[findFirst ? 'detect' : 'select']( function(c) { 
++    return (c.className &amp;&amp; c.className.match(classNameRegExp));
++  });
++  if(!results) results = [];
++  return results;
+ }
+ 
++Element.forceRerendering = function(element) {
++  try {
++    element = $(element);
++    var n = document.createTextNode(' ');
++    element.appendChild(n);
++    element.removeChild(n);
++  } catch(e) { }
++};
++
++/*--------------------------------------------------------------------------*/
++
+ Array.prototype.call = function() {
+   var args = arguments;
+   this.each(function(f){ f.apply(this, args) });
+@@ -139,7 +150,7 @@
+     var options = Object.extend({
+       queue: { position:'end', scope:(element.id || 'global'), limit: 1 }
+     }, arguments[2] || {});
+-    Effect[Element.visible(element) ? 
++    Effect[element.visible() ? 
+       Effect.PAIRS[effect][1] : Effect.PAIRS[effect][0]](element, options);
+   }
+ };
+@@ -343,15 +354,15 @@
+     this.element = $(element);
+     // make this work on IE on elements without 'layout'
+     if(/MSIE/.test(navigator.userAgent) &amp;&amp; (!this.element.hasLayout))
+-      Element.setStyle(this.element, {zoom: 1});
++      this.element.setStyle({zoom: 1});
+     var options = Object.extend({
+-      from: Element.getOpacity(this.element) || 0.0,
++      from: this.element.getOpacity() || 0.0,
+       to:   1.0
+     }, arguments[1] || {});
+     this.start(options);
+   },
+   update: function(position) {
+-    Element.setOpacity(this.element, position);
++    this.element.setOpacity(position);
+   }
+ });
+ 
+@@ -371,9 +382,9 @@
+     // relative element that does not have top/left explicitly set.
+     // ==&gt; Always set top and left for position relative elements in your stylesheets 
+     // (to 0 if you do not need them) 
+-    Element.makePositioned(this.element);
+-    this.originalLeft = parseFloat(Element.getStyle(this.element,'left') || '0');
+-    this.originalTop  = parseFloat(Element.getStyle(this.element,'top')  || '0');
++    this.element.makePositioned();
++    this.originalLeft = parseFloat(this.element.getStyle('left') || '0');
++    this.originalTop  = parseFloat(this.element.getStyle('top')  || '0');
+     if(this.options.mode == 'absolute') {
+       // absolute movement, so we need to calc deltaX and deltaY
+       this.options.x = this.options.x - this.originalLeft;
+@@ -381,7 +392,7 @@
+     }
+   },
+   update: function(position) {
+-    Element.setStyle(this.element, {
++    this.element.setStyle({
+       left: this.options.x  * position + this.originalLeft + 'px',
+       top:  this.options.y  * position + this.originalTop  + 'px'
+     });
+@@ -411,7 +422,7 @@
+   },
+   setup: function() {
+     this.restoreAfterFinish = this.options.restoreAfterFinish || false;
+-    this.elementPositioning = Element.getStyle(this.element,'position');
++    this.elementPositioning = this.element.getStyle('position');
+     
+     this.originalStyle = {};
+     ['top','left','width','height','fontSize'].each( function(k) {
+@@ -421,7 +432,7 @@
+     this.originalTop  = this.element.offsetTop;
+     this.originalLeft = this.element.offsetLeft;
+     
+-    var fontSize = Element.getStyle(this.element,'font-size') || '100%';
++    var fontSize = this.element.getStyle('font-size') || '100%';
+     ['em','px','%'].each( function(fontSizeType) {
+       if(fontSize.indexOf(fontSizeType)&gt;0) {
+         this.fontSize     = parseFloat(fontSize);
+@@ -443,11 +454,11 @@
+   update: function(position) {
+     var currentScale = (this.options.scaleFrom/100.0) + (this.factor * position);
+     if(this.options.scaleContent &amp;&amp; this.fontSize)
+-      Element.setStyle(this.element, {fontSize: this.fontSize * currentScale + this.fontSizeType });
++      this.element.setStyle({fontSize: this.fontSize * currentScale + this.fontSizeType });
+     this.setDimensions(this.dims[0] * currentScale, this.dims[1] * currentScale);
+   },
+   finish: function(position) {
+-    if (this.restoreAfterFinish) Element.setStyle(this.element, this.originalStyle);
++    if (this.restoreAfterFinish) this.element.setStyle(this.originalStyle);
+   },
+   setDimensions: function(height, width) {
+     var d = {};
+@@ -464,7 +475,7 @@
+         if(this.options.scaleX) d.left = -leftd + 'px';
+       }
+     }
+-    Element.setStyle(this.element, d);
++    this.element.setStyle(d);
+   }
+ });
+ 
+@@ -477,25 +488,25 @@
+   },
+   setup: function() {
+     // Prevent executing on elements not in the layout flow
+-    if(Element.getStyle(this.element, 'display')=='none') { this.cancel(); return; }
++    if(this.element.getStyle('display')=='none') { this.cancel(); return; }
+     // Disable background image during the effect
+     this.oldStyle = {
+-      backgroundImage: Element.getStyle(this.element, 'background-image') };
+-    Element.setStyle(this.element, {backgroundImage: 'none'});
++      backgroundImage: this.element.getStyle('background-image') };
++    this.element.setStyle({backgroundImage: 'none'});
+     if(!this.options.endcolor)
+-      this.options.endcolor = Element.getStyle(this.element, 'background-color').parseColor('#ffffff');
++      this.options.endcolor = this.element.getStyle('background-color').parseColor('#ffffff');
+     if(!this.options.restorecolor)
+-      this.options.restorecolor = Element.getStyle(this.element, 'background-color');
++      this.options.restorecolor = this.element.getStyle('background-color');
+     // init color calculations
+     this._base  = $R(0,2).map(function(i){ return parseInt(this.options.startcolor.slice(i*2+1,i*2+3),16) }.bind(this));
+     this._delta = $R(0,2).map(function(i){ return parseInt(this.options.endcolor.slice(i*2+1,i*2+3),16)-this._base[i] }.bind(this));
+   },
+   update: function(position) {
+-    Element.setStyle(this.element,{backgroundColor: $R(0,2).inject('#',function(m,v,i){
++    this.element.setStyle({backgroundColor: $R(0,2).inject('#',function(m,v,i){
+       return m+(Math.round(this._base[i]+(this._delta[i]*position)).toColorPart()); }.bind(this)) });
+   },
+   finish: function() {
+-    Element.setStyle(this.element, Object.extend(this.oldStyle, {
++    this.element.setStyle(Object.extend(this.oldStyle, {
+       backgroundColor: this.options.restorecolor
+     }));
+   }
+@@ -529,75 +540,83 @@
+ /* ------------- combination effects ------------- */
+ 
+ Effect.Fade = function(element) {
+-  var oldOpacity = Element.getInlineOpacity(element);
++  element = $(element);
++  var oldOpacity = element.getInlineOpacity();
+   var options = Object.extend({
+-  from: Element.getOpacity(element) || 1.0,
++  from: element.getOpacity() || 1.0,
+   to:   0.0,
+-  afterFinishInternal: function(effect) { with(Element) { 
++  afterFinishInternal: function(effect) { 
+     if(effect.options.to!=0) return;
+-    hide(effect.element);
+-    setStyle(effect.element, {opacity: oldOpacity}); }}
+-  }, arguments[1] || {});
++    effect.element.hide();
++    effect.element.setStyle({opacity: oldOpacity}); 
++  }}, arguments[1] || {});
+   return new Effect.Opacity(element,options);
+ }
+ 
+ Effect.Appear = function(element) {
++  element = $(element);
+   var options = Object.extend({
+-  from: (Element.getStyle(element, 'display') == 'none' ? 0.0 : Element.getOpacity(element) || 0.0),
++  from: (element.getStyle('display') == 'none' ? 0.0 : element.getOpacity() || 0.0),
+   to:   1.0,
+-  beforeSetup: function(effect) { with(Element) {
+-    setOpacity(effect.element, effect.options.from);
+-    show(effect.element); }}
+-  }, arguments[1] || {});
++  // force Safari to render floated elements properly
++  afterFinishInternal: function(effect) {
++    effect.element.forceRerendering();
++  },
++  beforeSetup: function(effect) {
++    effect.element.setOpacity(effect.options.from);
++    effect.element.show(); 
++  }}, arguments[1] || {});
+   return new Effect.Opacity(element,options);
+ }
+ 
+ Effect.Puff = function(element) {
+   element = $(element);
+-  var oldStyle = { opacity: Element.getInlineOpacity(element), position: Element.getStyle(element, 'position') };
++  var oldStyle = { opacity: element.getInlineOpacity(), position: element.getStyle('position') };
+   return new Effect.Parallel(
+    [ new Effect.Scale(element, 200, 
+       { sync: true, scaleFromCenter: true, scaleContent: true, restoreAfterFinish: true }), 
+      new Effect.Opacity(element, { sync: true, to: 0.0 } ) ], 
+      Object.extend({ duration: 1.0, 
+-      beforeSetupInternal: function(effect) { with(Element) {
+-        setStyle(effect.effects[0].element, {position: 'absolute'}); }},
+-      afterFinishInternal: function(effect) { with(Element) {
+-         hide(effect.effects[0].element);
+-         setStyle(effect.effects[0].element, oldStyle); }}
++      beforeSetupInternal: function(effect) {
++        effect.effects[0].element.setStyle({position: 'absolute'}); },
++      afterFinishInternal: function(effect) {
++         effect.effects[0].element.hide();
++         effect.effects[0].element.setStyle(oldStyle); }
+      }, arguments[1] || {})
+    );
+ }
+ 
+ Effect.BlindUp = function(element) {
+   element = $(element);
+-  Element.makeClipping(element);
++  element.makeClipping();
+   return new Effect.Scale(element, 0, 
+     Object.extend({ scaleContent: false, 
+       scaleX: false, 
+       restoreAfterFinish: true,
+-      afterFinishInternal: function(effect) { with(Element) {
+-        [hide, undoClipping].call(effect.element); }} 
++      afterFinishInternal: function(effect) {
++        effect.element.hide();
++        effect.element.undoClipping();
++      } 
+     }, arguments[1] || {})
+   );
+ }
+ 
+ Effect.BlindDown = function(element) {
+   element = $(element);
+-  var elementDimensions = Element.getDimensions(element);
++  var elementDimensions = element.getDimensions();
+   return new Effect.Scale(element, 100, 
+     Object.extend({ scaleContent: false, 
+       scaleX: false,
+       scaleFrom: 0,
+       scaleMode: {originalHeight: elementDimensions.height, originalWidth: elementDimensions.width},
+       restoreAfterFinish: true,
+-      afterSetup: function(effect) { with(Element) {
+-        makeClipping(effect.element);
+-        setStyle(effect.element, {height: '0px'});
+-        show(effect.element); 
+-      }},  
++      afterSetup: function(effect) {
++        effect.element.makeClipping();
++        effect.element.setStyle({height: '0px'});
++        effect.element.show(); 
++      },  
+       afterFinishInternal: function(effect) {
+-        Element.undoClipping(effect.element);
++        effect.element.undoClipping();
+       }
+     }, arguments[1] || {})
+   );
+@@ -605,7 +624,7 @@
+ 
+ Effect.SwitchOff = function(element) {
+   element = $(element);
+-  var oldOpacity = Element.getInlineOpacity(element);
++  var oldOpacity = element.getInlineOpacity();
+   return new Effect.Appear(element, { 
+     duration: 0.4,
+     from: 0,
+@@ -614,13 +633,16 @@
+       new Effect.Scale(effect.element, 1, { 
+         duration: 0.3, scaleFromCenter: true,
+         scaleX: false, scaleContent: false, restoreAfterFinish: true,
+-        beforeSetup: function(effect) { with(Element) {
+-          [makePositioned,makeClipping].call(effect.element);
+-        }},
+-        afterFinishInternal: function(effect) { with(Element) {
+-          [hide,undoClipping,undoPositioned].call(effect.element);
+-          setStyle(effect.element, {opacity: oldOpacity});
+-        }}
++        beforeSetup: function(effect) { 
++          effect.element.makePositioned();
++          effect.element.makeClipping();
++        },
++        afterFinishInternal: function(effect) {
++          effect.element.hide();
++          effect.element.undoClipping();
++          effect.element.undoPositioned();
++          effect.element.setStyle({opacity: oldOpacity});
++        }
+       })
+     }
+   });
+@@ -629,105 +651,110 @@
+ Effect.DropOut = function(element) {
+   element = $(element);
+   var oldStyle = {
+-    top: Element.getStyle(element, 'top'),
+-    left: Element.getStyle(element, 'left'),
+-    opacity: Element.getInlineOpacity(element) };
++    top: element.getStyle('top'),
++    left: element.getStyle('left'),
++    opacity: element.getInlineOpacity() };
+   return new Effect.Parallel(
+     [ new Effect.Move(element, {x: 0, y: 100, sync: true }), 
+       new Effect.Opacity(element, { sync: true, to: 0.0 }) ],
+     Object.extend(
+       { duration: 0.5,
+-        beforeSetup: function(effect) { with(Element) {
+-          makePositioned(effect.effects[0].element); }},
+-        afterFinishInternal: function(effect) { with(Element) {
+-          [hide, undoPositioned].call(effect.effects[0].element);
+-          setStyle(effect.effects[0].element, oldStyle); }} 
++        beforeSetup: function(effect) {
++          effect.effects[0].element.makePositioned(); 
++        },
++        afterFinishInternal: function(effect) {
++          effect.effects[0].element.hide();
++          effect.effects[0].element.undoPositioned();
++          effect.effects[0].element.setStyle(oldStyle);
++        } 
+       }, arguments[1] || {}));
+ }
+ 
+ Effect.Shake = function(element) {
+   element = $(element);
+   var oldStyle = {
+-    top: Element.getStyle(element, 'top'),
+-    left: Element.getStyle(element, 'left') };
+-	  return new Effect.Move(element, 
+-	    { x:  20, y: 0, duration: 0.05, afterFinishInternal: function(effect) {
+-	  new Effect.Move(effect.element,
+-	    { x: -40, y: 0, duration: 0.1,  afterFinishInternal: function(effect) {
+-	  new Effect.Move(effect.element,
+-	    { x:  40, y: 0, duration: 0.1,  afterFinishInternal: function(effect) {
+-	  new Effect.Move(effect.element,
+-	    { x: -40, y: 0, duration: 0.1,  afterFinishInternal: function(effect) {
+-	  new Effect.Move(effect.element,
+-	    { x:  40, y: 0, duration: 0.1,  afterFinishInternal: function(effect) {
+-	  new Effect.Move(effect.element,
+-	    { x: -20, y: 0, duration: 0.05, afterFinishInternal: function(effect) { with(Element) {
+-        undoPositioned(effect.element);
+-        setStyle(effect.element, oldStyle);
+-  }}}) }}) }}) }}) }}) }});
++    top: element.getStyle('top'),
++    left: element.getStyle('left') };
++    return new Effect.Move(element, 
++      { x:  20, y: 0, duration: 0.05, afterFinishInternal: function(effect) {
++    new Effect.Move(effect.element,
++      { x: -40, y: 0, duration: 0.1,  afterFinishInternal: function(effect) {
++    new Effect.Move(effect.element,
++      { x:  40, y: 0, duration: 0.1,  afterFinishInternal: function(effect) {
++    new Effect.Move(effect.element,
++      { x: -40, y: 0, duration: 0.1,  afterFinishInternal: function(effect) {
++    new Effect.Move(effect.element,
++      { x:  40, y: 0, duration: 0.1,  afterFinishInternal: function(effect) {
++    new Effect.Move(effect.element,
++      { x: -20, y: 0, duration: 0.05, afterFinishInternal: function(effect) {
++        effect.element.undoPositioned();
++        effect.element.setStyle(oldStyle);
++  }}) }}) }}) }}) }}) }});
+ }
+ 
+ Effect.SlideDown = function(element) {
+   element = $(element);
+-  Element.cleanWhitespace(element);
++  element.cleanWhitespace();
+   // SlideDown need to have the content of the element wrapped in a container element with fixed height!
+-  var oldInnerBottom = Element.getStyle(element.firstChild, 'bottom');
+-  var elementDimensions = Element.getDimensions(element);
++  var oldInnerBottom = $(element.firstChild).getStyle('bottom');
++  var elementDimensions = element.getDimensions();
+   return new Effect.Scale(element, 100, Object.extend({ 
+     scaleContent: false, 
+     scaleX: false, 
+-    scaleFrom: 0,
++    scaleFrom: window.opera ? 0 : 1,
+     scaleMode: {originalHeight: elementDimensions.height, originalWidth: elementDimensions.width},
+     restoreAfterFinish: true,
+-    afterSetup: function(effect) { with(Element) {
+-      makePositioned(effect.element);
+-      makePositioned(effect.element.firstChild);
+-      if(window.opera) setStyle(effect.element, {top: ''});
+-      makeClipping(effect.element);
+-      setStyle(effect.element, {height: '0px'});
+-      show(element); }},
+-    afterUpdateInternal: function(effect) { with(Element) {
+-      setStyle(effect.element.firstChild, {bottom:
+-        (effect.dims[0] - effect.element.clientHeight) + 'px' }); }},
+-    afterFinishInternal: function(effect) { with(Element) {
+-      undoClipping(effect.element); 
++    afterSetup: function(effect) {
++      effect.element.makePositioned();
++      effect.element.firstChild.makePositioned();
++      if(window.opera) effect.element.setStyle({top: ''});
++      effect.element.makeClipping();
++      effect.element.setStyle({height: '0px'});
++      effect.element.show(); },
++    afterUpdateInternal: function(effect) {
++      effect.element.firstChild.setStyle({bottom:
++        (effect.dims[0] - effect.element.clientHeight) + 'px' }); 
++    },
++    afterFinishInternal: function(effect) {
++      effect.element.undoClipping(); 
+       // IE will crash if child is undoPositioned first
+       if(/MSIE/.test(navigator.userAgent)){
+-        undoPositioned(effect.element);
+-        undoPositioned(effect.element.firstChild);
++        effect.element.undoPositioned();
++        effect.element.firstChild.undoPositioned();
+       }else{
+-        undoPositioned(effect.element.firstChild);
+-        undoPositioned(effect.element);
++        effect.element.firstChild.undoPositioned();
++        effect.element.undoPositioned();
+       }
+-      setStyle(effect.element.firstChild, {bottom: oldInnerBottom}); }}
++      effect.element.firstChild.setStyle({bottom: oldInnerBottom}); }
+     }, arguments[1] || {})
+   );
+ }
+   
+ Effect.SlideUp = function(element) {
+   element = $(element);
+-  Element.cleanWhitespace(element);
+-  var oldInnerBottom = Element.getStyle(element.firstChild, 'bottom');
+-  return new Effect.Scale(element, 0, 
++  element.cleanWhitespace();
++  var oldInnerBottom = $(element.firstChild).getStyle('bottom');
++  return new Effect.Scale(element, window.opera ? 0 : 1,
+    Object.extend({ scaleContent: false, 
+     scaleX: false, 
+     scaleMode: 'box',
+     scaleFrom: 100,
+     restoreAfterFinish: true,
+-    beforeStartInternal: function(effect) { with(Element) {
+-      makePositioned(effect.element);
+-      makePositioned(effect.element.firstChild);
+-      if(window.opera) setStyle(effect.element, {top: ''});
+-      makeClipping(effect.element);
+-      show(element); }},  
+-    afterUpdateInternal: function(effect) { with(Element) {
+-      setStyle(effect.element.firstChild, {bottom:
+-        (effect.dims[0] - effect.element.clientHeight) + 'px' }); }},
+-    afterFinishInternal: function(effect) { with(Element) {
+-        [hide, undoClipping].call(effect.element); 
+-        undoPositioned(effect.element.firstChild);
+-        undoPositioned(effect.element);
+-        setStyle(effect.element.firstChild, {bottom: oldInnerBottom}); }}
++    beforeStartInternal: function(effect) {
++      effect.element.makePositioned();
++      effect.element.firstChild.makePositioned();
++      if(window.opera) effect.element.setStyle({top: ''});
++      effect.element.makeClipping();
++      effect.element.show(); },  
++    afterUpdateInternal: function(effect) {
++      effect.element.firstChild.setStyle({bottom:
++        (effect.dims[0] - effect.element.clientHeight) + 'px' }); },
++    afterFinishInternal: function(effect) {
++      effect.element.hide();
++      effect.element.undoClipping();
++      effect.element.firstChild.undoPositioned();
++      effect.element.undoPositioned();
++      effect.element.setStyle({bottom: oldInnerBottom}); }
+    }, arguments[1] || {})
+   );
+ }
+@@ -736,11 +763,11 @@
+ Effect.Squish = function(element) {
+   return new Effect.Scale(element, window.opera ? 1 : 0, 
+     { restoreAfterFinish: true,
+-      beforeSetup: function(effect) { with(Element) {
+-        makeClipping(effect.element); }},  
+-      afterFinishInternal: function(effect) { with(Element) {
+-        hide(effect.element); 
+-        undoClipping(effect.element); }}
++      beforeSetup: function(effect) {
++        effect.element.makeClipping(effect.element); },  
++      afterFinishInternal: function(effect) {
++        effect.element.hide(effect.element); 
++        effect.element.undoClipping(effect.element); }
+   });
+ }
+ 
+@@ -757,9 +784,9 @@
+     left: element.style.left,
+     height: element.style.height,
+     width: element.style.width,
+-    opacity: Element.getInlineOpacity(element) };
++    opacity: element.getInlineOpacity() };
+ 
+-  var dims = Element.getDimensions(element);    
++  var dims = element.getDimensions();    
+   var initialMoveX, initialMoveY;
+   var moveX, moveY;
+   
+@@ -795,11 +822,11 @@
+     x: initialMoveX,
+     y: initialMoveY,
+     duration: 0.01, 
+-    beforeSetup: function(effect) { with(Element) {
+-      hide(effect.element);
+-      makeClipping(effect.element);
+-      makePositioned(effect.element);
+-    }},
++    beforeSetup: function(effect) {
++      effect.element.hide();
++      effect.element.makeClipping();
++      effect.element.makePositioned();
++    },
+     afterFinishInternal: function(effect) {
+       new Effect.Parallel(
+         [ new Effect.Opacity(effect.element, { sync: true, to: 1.0, from: 0.0, transition: options.opacityTransition }),
+@@ -808,12 +835,15 @@
+             scaleMode: { originalHeight: dims.height, originalWidth: dims.width }, 
+             sync: true, scaleFrom: window.opera ? 1 : 0, transition: options.scaleTransition, restoreAfterFinish: true})
+         ], Object.extend({
+-             beforeSetup: function(effect) { with(Element) {
+-               setStyle(effect.effects[0].element, {height: '0px'});
+-               show(effect.effects[0].element); }},
+-             afterFinishInternal: function(effect) { with(Element) {
+-               [undoClipping, undoPositioned].call(effect.effects[0].element); 
+-               setStyle(effect.effects[0].element, oldStyle); }}
++             beforeSetup: function(effect) {
++               effect.effects[0].element.setStyle({height: '0px'});
++               effect.effects[0].element.show(); 
++             },
++             afterFinishInternal: function(effect) {
++               effect.effects[0].element.undoClipping();
++               effect.effects[0].element.undoPositioned();
++               effect.effects[0].element.setStyle(oldStyle); 
++             }
+            }, options)
+       )
+     }
+@@ -833,9 +863,9 @@
+     left: element.style.left,
+     height: element.style.height,
+     width: element.style.width,
+-    opacity: Element.getInlineOpacity(element) };
++    opacity: element.getInlineOpacity() };
+ 
+-  var dims = Element.getDimensions(element);
++  var dims = element.getDimensions();
+   var moveX, moveY;
+   
+   switch (options.direction) {
+@@ -865,11 +895,14 @@
+       new Effect.Scale(element, window.opera ? 1 : 0, { sync: true, transition: options.scaleTransition, restoreAfterFinish: true}),
+       new Effect.Move(element, { x: moveX, y: moveY, sync: true, transition: options.moveTransition })
+     ], Object.extend({            
+-         beforeStartInternal: function(effect) { with(Element) {
+-           [makePositioned, makeClipping].call(effect.effects[0].element) }},
+-         afterFinishInternal: function(effect) { with(Element) {
+-           [hide, undoClipping, undoPositioned].call(effect.effects[0].element);
+-           setStyle(effect.effects[0].element, oldStyle); }}
++         beforeStartInternal: function(effect) {
++           effect.effects[0].element.makePositioned();
++           effect.effects[0].element.makeClipping(); },
++         afterFinishInternal: function(effect) {
++           effect.effects[0].element.hide();
++           effect.effects[0].element.undoClipping();
++           effect.effects[0].element.undoPositioned();
++           effect.effects[0].element.setStyle(oldStyle); }
+        }, options)
+   );
+ }
+@@ -877,13 +910,13 @@
+ Effect.Pulsate = function(element) {
+   element = $(element);
+   var options    = arguments[1] || {};
+-  var oldOpacity = Element.getInlineOpacity(element);
++  var oldOpacity = element.getInlineOpacity();
+   var transition = options.transition || Effect.Transitions.sinoidal;
+   var reverser   = function(pos){ return transition(1-Effect.Transitions.pulse(pos)) };
+   reverser.bind(transition);
+   return new Effect.Opacity(element, 
+     Object.extend(Object.extend({  duration: 3.0, from: 0,
+-      afterFinishInternal: function(effect) { Element.setStyle(effect.element, {opacity: oldOpacity}); }
++      afterFinishInternal: function(effect) { effect.element.setStyle({opacity: oldOpacity}); }
+     }, options), {transition: reverser}));
+ }
+ 
+@@ -902,9 +935,24 @@
+     new Effect.Scale(element, 1, { 
+       scaleContent: false, 
+       scaleY: false,
+-      afterFinishInternal: function(effect) { with(Element) {
+-        [hide, undoClipping].call(effect.element); 
+-        setStyle(effect.element, oldStyle);
+-      }} });
++      afterFinishInternal: function(effect) {
++        effect.element.hide();
++        effect.element.undoClipping(); 
++        effect.element.setStyle(oldStyle);
++      } });
+   }}, arguments[1] || {}));
+-}
++};
++
++['setOpacity','getOpacity','getInlineOpacity','forceRerendering','setContentZoom',
++ 'collectTextNodes','collectTextNodesIgnoreClass','childrenWithClassName'].each( 
++  function(f) { Element.Methods[f] = Element[f]; }
++);
++
++Element.Methods.visualEffect = function(element, effect, options) {
++  s = effect.gsub(/_/, '-').camelize();
++  effect_class = s.charAt(0).toUpperCase() + s.substring(1);
++  new Effect[effect_class](element, options);
++  return $(element);
++};
++
++Element.addMethods();
+\ No newline at end of file
+
+Modified: trunk/medickart/public/javascript/prototype.js
+===================================================================
+--- trunk/medickart/public/javascript/prototype.js	2006-04-16 08:40:43 UTC (rev 8)
++++ trunk/medickart/public/javascript/prototype.js	2006-04-16 09:00:36 UTC (rev 9)
+@@ -1,17 +1,13 @@
+-/*  Prototype JavaScript framework, version 1.4.0
++/*  Prototype JavaScript framework, version 1.5.0_rc0
+  *  (c) 2005 Sam Stephenson &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/rwd-svn">sam at conio.net</A>&gt;
+  *
+- *  THIS FILE IS AUTOMATICALLY GENERATED. When sending patches, please diff
+- *  against the source tree, available from the Prototype darcs repository.
+- *
+  *  Prototype is freely distributable under the terms of an MIT-style license.
+- *
+  *  For details, see the Prototype web site: <A HREF="http://prototype.conio.net/">http://prototype.conio.net/</A>
+  *
+ /*--------------------------------------------------------------------------*/
+ 
+ var Prototype = {
+-  Version: '1.4.0',
++  Version: '1.5.0_rc0',
+   ScriptFragment: '(?:&lt;script.*?&gt;)((\n|\r|.)*?)(?:&lt;\/script&gt;)',
+ 
+   emptyFunction: function() {},
+@@ -29,7 +25,7 @@
+ var Abstract = new Object();
+ 
+ Object.extend = function(destination, source) {
+-  for (property in source) {
++  for (var property in source) {
+     destination[property] = source[property];
+   }
+   return destination;
+@@ -120,26 +116,49 @@
+     }
+   }
+ }
++Object.extend(String.prototype, {
++  gsub: function(pattern, replacement) {
++    var result = '', source = this, match;
++    replacement = arguments.callee.prepareReplacement(replacement);
+ 
+-/*--------------------------------------------------------------------------*/
++    while (source.length &gt; 0) {
++      if (match = source.match(pattern)) {
++        result += source.slice(0, match.index);
++        result += (replacement(match) || '').toString();
++        source  = source.slice(match.index + match[0].length);
++      } else {
++        result += source, source = '';
++      }
++    }
++    return result;
++  },
+ 
+-function $() {
+-  var elements = new Array();
++  sub: function(pattern, replacement, count) {
++    replacement = this.gsub.prepareReplacement(replacement);
++    count = count === undefined ? 1 : count;
+ 
+-  for (var i = 0; i &lt; arguments.length; i++) {
+-    var element = arguments[i];
+-    if (typeof element == 'string')
+-      element = document.getElementById(element);
++    return this.gsub(pattern, function(match) {
++      if (--count &lt; 0) return match[0];
++      return replacement(match);
++    });
++  },
+ 
+-    if (arguments.length == 1)
+-      return element;
++  scan: function(pattern, iterator) {
++    this.gsub(pattern, iterator);
++    return this;
++  },
+ 
+-    elements.push(element);
+-  }
++  truncate: function(length, truncation) {
++    length = length || 30;
++    truncation = truncation === undefined ? '...' : truncation;
++    return this.length &gt; length ?
++      this.slice(0, length - truncation.length) + truncation : this;
++  },
+ 
+-  return elements;
+-}
+-Object.extend(String.prototype, {
++  strip: function() {
++    return this.replace(/^\s+/, '').replace(/\s+$/, '');
++  },
++
+   stripTags: function() {
+     return this.replace(/&lt;\/?[^&gt;]+&gt;/gi, '');
+   },
+@@ -157,7 +176,7 @@
+   },
+ 
+   evalScripts: function() {
+-    return this.extractScripts().map(eval);
++    return this.extractScripts().map(function(script) { return eval(script) });
+   },
+ 
+   escapeHTML: function() {
+@@ -203,12 +222,35 @@
+   },
+ 
+   inspect: function() {
+-    return &quot;'&quot; + this.replace('\\', '\\\\').replace(&quot;'&quot;, '\\\'') + &quot;'&quot;;
++    return &quot;'&quot; + this.replace(/\\/g, '\\\\').replace(/'/g, '\\\'') + &quot;'&quot;;
+   }
+ });
+ 
++String.prototype.gsub.prepareReplacement = function(replacement) {
++  if (typeof replacement == 'function') return replacement;
++  var template = new Template(replacement);
++  return function(match) { return template.evaluate(match) };
++}
++
+ String.prototype.parseQuery = String.prototype.toQueryParams;
+ 
++var Template = Class.create();
++Template.Pattern = /(^|.|\r|\n)(#\{(.*?)\})/;
++Template.prototype = {
++  initialize: function(template, pattern) {
++    this.template = template.toString();
++    this.pattern  = pattern || Template.Pattern;
++  },
++
++  evaluate: function(object) {
++    return this.template.gsub(this.pattern, function(match) {
++      var before = match[1];
++      if (before == '\\') return match[2];
++      return before + (object[match[3]] || '').toString();
++    });
++  }
++}
++
+ var $break    = new Object();
+ var $continue = new Object();
+ 
+@@ -313,7 +355,7 @@
+     var result;
+     this.each(function(value, index) {
+       value = (iterator || Prototype.K)(value, index);
+-      if (value &gt;= (result || value))
++      if (result == undefined || value &gt;= result)
+         result = value;
+     });
+     return result;
+@@ -323,7 +365,7 @@
+     var result;
+     this.each(function(value, index) {
+       value = (iterator || Prototype.K)(value, index);
+-      if (value &lt;= (result || value))
++      if (result == undefined || value &lt; result)
+         result = value;
+     });
+     return result;
+@@ -375,8 +417,7 @@
+ 
+     var collections = [this].concat(args).map($A);
+     return this.map(function(value, index) {
+-      iterator(value = collections.pluck(index));
+-      return value;
++      return iterator(collections.pluck(index));
+     });
+   },
+ 
+@@ -406,7 +447,8 @@
+ 
+ Object.extend(Array.prototype, Enumerable);
+ 
+-Array.prototype._reverse = Array.prototype.reverse;
++if (!Array.prototype._reverse)
++  Array.prototype._reverse = Array.prototype.reverse;
+ 
+ Object.extend(Array.prototype, {
+   _each: function(iterator) {
+@@ -435,7 +477,7 @@
+ 
+   flatten: function() {
+     return this.inject([], function(array, value) {
+-      return array.concat(value.constructor == Array ?
++      return array.concat(value &amp;&amp; value.constructor == Array ?
+         value.flatten() : [value]);
+     });
+   },
+@@ -457,21 +499,13 @@
+     return (inline !== false ? this : this.toArray())._reverse();
+   },
+ 
+-  shift: function() {
+-    var result = this[0];
+-    for (var i = 0; i &lt; this.length - 1; i++)
+-      this[i] = this[i + 1];
+-    this.length--;
+-    return result;
+-  },
+-
+   inspect: function() {
+     return '[' + this.map(Object.inspect).join(', ') + ']';
+   }
+ });
+ var Hash = {
+   _each: function(iterator) {
+-    for (key in this) {
++    for (var key in this) {
+       var value = this[key];
+       if (typeof value == 'function') continue;
+ 
+@@ -549,9 +583,9 @@
+ var Ajax = {
+   getTransport: function() {
+     return Try.these(
++      function() {return new XMLHttpRequest()},
+       function() {return new ActiveXObject('Msxml2.XMLHTTP')},
+-      function() {return new ActiveXObject('Microsoft.XMLHTTP')},
+-      function() {return new XMLHttpRequest()}
++      function() {return new ActiveXObject('Microsoft.XMLHTTP')}
+     ) || false;
+   },
+ 
+@@ -603,6 +637,7 @@
+     this.options = {
+       method:       'post',
+       asynchronous: true,
++      contentType:  'application/x-www-form-urlencoded',
+       parameters:   ''
+     }
+     Object.extend(this.options, options || {});
+@@ -662,11 +697,11 @@
+   setRequestHeaders: function() {
+     var requestHeaders =
+       ['X-Requested-With', 'XMLHttpRequest',
+-       'X-Prototype-Version', Prototype.Version];
++       'X-Prototype-Version', Prototype.Version,
++       'Accept', 'text/javascript, text/html, application/xml, text/xml, */*'];
+ 
+     if (this.options.method == 'post') {
+-      requestHeaders.push('Content-type',
+-        'application/x-www-form-urlencoded');
++      requestHeaders.push('Content-type', this.options.contentType);
+ 
+       /* Force &quot;Connection: close&quot; for Mozilla browsers to work around
+        * a bug where XMLHttpReqeuest sends an incorrect Content-length
+@@ -697,7 +732,7 @@
+ 
+   evalJSON: function() {
+     try {
+-      return eval(this.header('X-JSON'));
++      return eval('(' + this.header('X-JSON') + ')');
+     } catch (e) {}
+   },
+ 
+@@ -831,22 +866,57 @@
+     this.updater = new Ajax.Updater(this.container, this.url, this.options);
+   }
+ });
++function $() {
++  var results = [], element;
++  for (var i = 0; i &lt; arguments.length; i++) {
++    element = arguments[i];
++    if (typeof element == 'string')
++      element = document.getElementById(element);
++    results.push(Element.extend(element));
++  }
++  return results.length &lt; 2 ? results[0] : results;
++}
++
+ document.getElementsByClassName = function(className, parentElement) {
+   var children = ($(parentElement) || document.body).getElementsByTagName('*');
+   return $A(children).inject([], function(elements, child) {
+     if (child.className.match(new RegExp(&quot;(^|\\s)&quot; + className + &quot;(\\s|$)&quot;)))
+-      elements.push(child);
++      elements.push(Element.extend(child));
+     return elements;
+   });
+ }
+ 
+ /*--------------------------------------------------------------------------*/
+ 
+-if (!window.Element) {
++if (!window.Element)
+   var Element = new Object();
++
++Element.extend = function(element) {
++  if (!element) return;
++  if (_nativeExtensions) return element;
++
++  if (!element._extended &amp;&amp; element.tagName &amp;&amp; element != window) {
++    var methods = Element.Methods, cache = Element.extend.cache;
++    for (property in methods) {
++      var value = methods[property];
++      if (typeof value == 'function')
++        element[property] = cache.findOrStore(value);
++    }
++  }
++
++  element._extended = true;
++  return element;
+ }
+ 
+-Object.extend(Element, {
++Element.extend.cache = {
++  findOrStore: function(value) {
++    return this[value] = this[value] || function() {
++      return value.apply(null, [this].concat($A(arguments)));
++    }
++  }
++}
++
++Element.Methods = {
+   visible: function(element) {
+     return $(element).style.display != 'none';
+   },
+@@ -882,6 +952,19 @@
+     setTimeout(function() {html.evalScripts()}, 10);
+   },
+ 
++  replace: function(element, html) {
++    element = $(element);
++    if (element.outerHTML) {
++      element.outerHTML = html.stripScripts();
++    } else {
++      var range = element.ownerDocument.createRange();
++      range.selectNodeContents(element);
++      element.parentNode.replaceChild(
++        range.createContextualFragment(html.stripScripts()), element);
++    }
++    setTimeout(function() {html.evalScripts()}, 10);
++  },
++
+   getHeight: function(element) {
+     element = $(element);
+     return element.offsetHeight;
+@@ -920,6 +1003,13 @@
+     return $(element).innerHTML.match(/^\s*$/);
+   },
+ 
++  childOf: function(element, ancestor) {
++    element = $(element), ancestor = $(ancestor);
++    while (element = element.parentNode)
++      if (element == ancestor) return true;
++    return false;
++  },
++
+   scrollTo: function(element) {
+     element = $(element);
+     var x = element.x ? element.x : element.offsetLeft,
+@@ -947,7 +1037,7 @@
+ 
+   setStyle: function(element, style) {
+     element = $(element);
+-    for (name in style)
++    for (var name in style)
+       element.style[name.camelize()] = style[name];
+   },
+ 
+@@ -1013,8 +1103,33 @@
+     element.style.overflow = element._overflow;
+     element._overflow = undefined;
+   }
+-});
++}
+ 
++Object.extend(Element, Element.Methods);
++
++var _nativeExtensions = false;
++
++if(!HTMLElement &amp;&amp; /Konqueror|Safari|KHTML/.test(navigator.userAgent)) {
++  var HTMLElement = {}
++  HTMLElement.prototype = document.createElement('div').__proto__;
++}
++
++Element.addMethods = function(methods) {
++  Object.extend(Element.Methods, methods || {});
++
++  if(typeof HTMLElement != 'undefined') {
++    var methods = Element.Methods, cache = Element.extend.cache;
++    for (property in methods) {
++      var value = methods[property];
++      if (typeof value == 'function')
++        HTMLElement.prototype[property] = cache.findOrStore(value);
++    }
++    _nativeExtensions = true;
++  }
++}
++
++Element.addMethods();
++
+ var Toggle = new Object();
+ Toggle.display = Element.toggle;
+ 
+@@ -1033,7 +1148,8 @@
+       try {
+         this.element.insertAdjacentHTML(this.adjacency, this.content);
+       } catch (e) {
+-        if (this.element.tagName.toLowerCase() == 'tbody') {
++        var tagName = this.element.tagName.toLowerCase();
++        if (tagName == 'tbody' || tagName == 'tr') {
+           this.insertContent(this.contentFromAnonymousTable());
+         } else {
+           throw e;
+@@ -1148,6 +1264,116 @@
+ }
+ 
+ Object.extend(Element.ClassNames.prototype, Enumerable);
++var Selector = Class.create();
++Selector.prototype = {
++  initialize: function(expression) {
++    this.params = {classNames: []};
++    this.expression = expression.toString().strip();
++    this.parseExpression();
++    this.compileMatcher();
++  },
++
++  parseExpression: function() {
++    function abort(message) { throw 'Parse error in selector: ' + message; }
++
++    if (this.expression == '')  abort('empty expression');
++
++    var params = this.params, expr = this.expression, match, modifier, clause, rest;
++    while (match = expr.match(/^(.*)\[([a-z0-9_:-]+?)(?:([~\|!]?=)(?:&quot;([^&quot;]*)&quot;|([^\]\s]*)))?\]$/i)) {
++      params.attributes = params.attributes || [];
++      params.attributes.push({name: match[2], operator: match[3], value: match[4] || match[5] || ''});
++      expr = match[1];
++    }
++
++    if (expr == '*') return this.params.wildcard = true;
++
++    while (match = expr.match(/^([^a-z0-9_-])?([a-z0-9_-]+)(.*)/i)) {
++      modifier = match[1], clause = match[2], rest = match[3];
++      switch (modifier) {
++        case '#':       params.id = clause; break;
++        case '.':       params.classNames.push(clause); break;
++        case '':
++        case undefined: params.tagName = clause.toUpperCase(); break;
++        default:        abort(expr.inspect());
++      }
++      expr = rest;
++    }
++
++    if (expr.length &gt; 0) abort(expr.inspect());
++  },
++
++  buildMatchExpression: function() {
++    var params = this.params, conditions = [], clause;
++
++    if (params.wildcard)
++      conditions.push('true');
++    if (clause = params.id)
++      conditions.push('element.id == ' + clause.inspect());
++    if (clause = params.tagName)
++      conditions.push('element.tagName.toUpperCase() == ' + clause.inspect());
++    if ((clause = params.classNames).length &gt; 0)
++      for (var i = 0; i &lt; clause.length; i++)
++        conditions.push('Element.hasClassName(element, ' + clause[i].inspect() + ')');
++    if (clause = params.attributes) {
++      clause.each(function(attribute) {
++        var value = 'element.getAttribute(' + attribute.name.inspect() + ')';
++        var splitValueBy = function(delimiter) {
++          return value + ' &amp;&amp; ' + value + '.split(' + delimiter.inspect() + ')';
++        }
++
++        switch (attribute.operator) {
++          case '=':       conditions.push(value + ' == ' + attribute.value.inspect()); break;
++          case '~=':      conditions.push(splitValueBy(' ') + '.include(' + attribute.value.inspect() + ')'); break;
++          case '|=':      conditions.push(
++                            splitValueBy('-') + '.first().toUpperCase() == ' + attribute.value.toUpperCase().inspect()
++                          ); break;
++          case '!=':      conditions.push(value + ' != ' + attribute.value.inspect()); break;
++          case '':
++          case undefined: conditions.push(value + ' != null'); break;
++          default:        throw 'Unknown operator ' + attribute.operator + ' in selector';
++        }
++      });
++    }
++
++    return conditions.join(' &amp;&amp; ');
++  },
++
++  compileMatcher: function() {
++    this.match = new Function('element', 'if (!element.tagName) return false; \
++      return ' + this.buildMatchExpression());
++  },
++
++  findElements: function(scope) {
++    var element;
++
++    if (element = $(this.params.id))
++      if (this.match(element))
++        if (!scope || Element.childOf(element, scope))
++          return [element];
++
++    scope = (scope || document).getElementsByTagName(this.params.tagName || '*');
++
++    var results = [];
++    for (var i = 0; i &lt; scope.length; i++)
++      if (this.match(element = scope[i]))
++        results.push(Element.extend(element));
++
++    return results;
++  },
++
++  toString: function() {
++    return this.expression;
++  }
++}
++
++function $$() {
++  return $A(arguments).map(function(expression) {
++    return expression.strip().split(/\s+/).inject([null], function(results, expr) {
++      var selector = new Selector(expr);
++      return results.map(selector.findElements.bind(selector)).flatten();
++    });
++  }).flatten();
++}
+ var Field = {
+   clear: function() {
+     for (var i = 0; i &lt; arguments.length; i++)
+@@ -1196,7 +1422,7 @@
+     form = $(form);
+     var elements = new Array();
+ 
+-    for (tagName in Form.Element.Serializers) {
++    for (var tagName in Form.Element.Serializers) {
+       var tagElements = form.getElementsByTagName(tagName);
+       for (var j = 0; j &lt; tagElements.length; j++)
+         elements.push(tagElements[j]);
+@@ -1318,23 +1544,17 @@
+     var value = '', opt, index = element.selectedIndex;
+     if (index &gt;= 0) {
+       opt = element.options[index];
+-      value = opt.value;
+-      if (!value &amp;&amp; !('value' in opt))
+-        value = opt.text;
++      value = opt.value || opt.text;
+     }
+     return [element.name, value];
+   },
+ 
+   selectMany: function(element) {
+-    var value = new Array();
++    var value = [];
+     for (var i = 0; i &lt; element.length; i++) {
+       var opt = element.options[i];
+-      if (opt.selected) {
+-        var optValue = opt.value;
+-        if (!optValue &amp;&amp; !('value' in opt))
+-          optValue = opt.text;
+-        value.push(optValue);
+-      }
++      if (opt.selected)
++        value.push(opt.value || opt.text);
+     }
+     return [element.name, value];
+   }
+@@ -1551,7 +1771,8 @@
+ });
+ 
+ /* prevent memory leaks in IE */
+-Event.observe(window, 'unload', Event.unloadCache, false);
++if (navigator.appVersion.match(/\bMSIE\b/))
++  Event.observe(window, 'unload', Event.unloadCache, false);
+ var Position = {
+   // set to true if needed, warning: firefox performance problems
+   // NOT neeeded for page scrolling, only if draggable contained in
+
+Modified: trunk/medickart/public/javascript/scriptaculous.js
+===================================================================
+--- trunk/medickart/public/javascript/scriptaculous.js	2006-04-16 08:40:43 UTC (rev 8)
++++ trunk/medickart/public/javascript/scriptaculous.js	2006-04-16 09:00:36 UTC (rev 9)
+@@ -20,16 +20,18 @@
+ // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ 
+ var Scriptaculous = {
+-  Version: '1.5.3',
++  Version: '1.6.1',
+   require: function(libraryName) {
+     // inserting via DOM fails in Safari 2.0, so brute force approach
+     document.write('&lt;script type=&quot;text/javascript&quot; src=&quot;'+libraryName+'&quot;&gt;&lt;/script&gt;');
+   },
+   load: function() {
+-    if((typeof Prototype=='undefined') ||
+-      parseFloat(Prototype.Version.split(&quot;.&quot;)[0] + &quot;.&quot; +
+-                 Prototype.Version.split(&quot;.&quot;)[1]) &lt; 1.4)
+-      throw(&quot;script.aculo.us requires the Prototype JavaScript framework &gt;= 1.4.0&quot;);
++    if((typeof Prototype=='undefined') || 
++       (typeof Element == 'undefined') || 
++       (typeof Element.Methods=='undefined') ||
++       parseFloat(Prototype.Version.split(&quot;.&quot;)[0] + &quot;.&quot; +
++                  Prototype.Version.split(&quot;.&quot;)[1]) &lt; 1.5)
++       throw(&quot;script.aculo.us requires the Prototype JavaScript framework &gt;= 1.5.0&quot;);
+     
+     $A(document.getElementsByTagName(&quot;script&quot;)).findAll( function(s) {
+       return (s.src &amp;&amp; s.src.match(/scriptaculous\.js(\?.*)?$/))
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000001.html">[Rwd-svn] r8 - in trunk: . medickart
+</A></li>
+	<LI>Next message: <A HREF="000003.html">[Rwd-svn] r11 - in trunk/medickart: conf db
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#2">[ date ]</a>
+              <a href="thread.html#2">[ thread ]</a>
+              <a href="subject.html#2">[ subject ]</a>
+              <a href="author.html#2">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/rwd-svn">More information about the Rwd-svn
+mailing list</a><br>
+</body></html>

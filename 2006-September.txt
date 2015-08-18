@@ -1,0 +1,384 @@
+From rwd-svn at lists.berlios.de  Fri Sep  1 17:15:25 2006
+From: rwd-svn at lists.berlios.de (rwd-svn at lists.berlios.de)
+Date: Fri, 1 Sep 2006 17:15:25 +0200
+Subject: [Rwd-svn] r35 - exp/aurelian
+Message-ID: <200609011515.k81FFPF4032188@sheep.berlios.de>
+
+Author: aurelian
+Date: 2006-09-01 17:15:24 +0200 (Fri, 01 Sep 2006)
+New Revision: 35
+
+Added:
+   exp/aurelian/my.cnf
+Log:
+ MySQL optimization sample.
+
+Added: exp/aurelian/my.cnf
+===================================================================
+--- exp/aurelian/my.cnf	2006-08-28 14:55:37 UTC (rev 34)
++++ exp/aurelian/my.cnf	2006-09-01 15:15:24 UTC (rev 35)
+@@ -0,0 +1,101 @@
++#
++# $Id$
++#
++
++# The following options will be passed to all MySQL clients
++[client]
++port   = 3306
++socket = /tmp/mysql.sock
++
++# Here follows entries for some specific programs
++# The MySQL server
++[mysqld]
++# Skip 
++#  -> Engines that we are not going to use
++#  -> networking (connection only from localhost allowed
++#  -> locking
++skip-locking
++skip-bdb
++skip-ndbcluster
++skip-networking
++# Default port, socket and connection
++port		= 3306
++socket		= /tmp/mysql.sock
++max_connections = 400
++
++#
++# MySQL READ optimisations
++#
++
++# The key buffer stores database indexes in memory.
++# sum of all indexes
++key_buffer = 64M # memory cache of the indexes
++max_allowed_packet = 2M
++# The table cache tells MySQL how many tables it can have open at any one time. 
++# In SQL queries, several tables are typically joined. 
++# The rule of thumb is that you should multiply the maximum number of 
++# connections by the maximum number of tables used in joins. 
++# For example, if the maximum number of connections is set to 400, 
++# the table cache should be at least 400 * 10. 
++# The configuration setting below shows a table cache of 200 (HUB has 16 tables):
++table_cache = 200 # ++
++# MySQL sorts results before they are returned.
++# This is per connection, so at 400 concurent open connections
++# it will take 400*2RAM
++sort_buffer_size = 2M
++read_buffer_size = 2M
++read_rnd_buffer_size = 2M
++myisam_sort_buffer_size = 16M
++
++# net_buffer_length = 16K
++
++# Activate query caching
++query-cache-type = 1
++# Memory globally available for query caches
++# It should be incresead for large dataabses
++query-cache-size = 64M # ++
++# Max size each cached query
++# If the query result is larger than the query cache limit, 
++# the results will not be cached.
++query_cache_limit = 1M
++
++#
++# MySQL WRITE optimizations (InnoDB)
++#
++
++# Change /wwwdata to where you keep mysql databases
++innodb_data_home_dir = /wwwroot/data/
++innodb_data_file_path = ibdata1:100M;ibdata2:100M:autoextend
++innodb_log_group_home_dir = /wwwroot/data/
++innodb_log_arch_dir = /wwwroot/data/
++# You can set .._buffer_pool_size up to 50 - 80 %
++# of RAM but beware of setting memory usage too high
++innodb_buffer_pool_size = 128M # ++ (more reads from memory, less I/O)
++innodb_additional_mem_pool_size = 16M # ++
++# Set .._log_file_size to 25 % of buffer pool size
++innodb_log_file_size = 32M
++innodb_log_buffer_size = 4M
++innodb_flush_log_at_trx_commit = 0 # change to 1 if you expect server crashes!!!
++# innodb_lock_wait_timeout = 50
++
++[mysqldump]
++quick
++max_allowed_packet = 16M
++
++[mysql]
++no-auto-rehash
++
++[isamchk]
++key_buffer = 20M
++sort_buffer_size = 20M
++read_buffer = 2M
++write_buffer = 2M
++
++[myisamchk]
++key_buffer = 20M
++sort_buffer_size = 20M
++read_buffer = 2M
++write_buffer = 2M
++
++[mysqlhotcopy]
++interactive-timeout
+
+
+Property changes on: exp/aurelian/my.cnf
+___________________________________________________________________
+Name: svn:keywords
+   + Id
+
+
+
+From rwd-svn at lists.berlios.de  Fri Sep  1 19:40:30 2006
+From: rwd-svn at lists.berlios.de (rwd-svn at lists.berlios.de)
+Date: Fri, 1 Sep 2006 19:40:30 +0200
+Subject: [Rwd-svn] r36 - in exp/aurelian: . Operatr
+Message-ID: <200609011740.k81HeUlQ028350@sheep.berlios.de>
+
+Author: aurelian
+Date: 2006-09-01 19:40:29 +0200 (Fri, 01 Sep 2006)
+New Revision: 36
+
+Added:
+   exp/aurelian/Operatr/
+   exp/aurelian/Operatr/operatr-0.1.c
+   exp/aurelian/Operatr/operatr.c
+Log:
+ initial operatr
+
+Added: exp/aurelian/Operatr/operatr-0.1.c
+===================================================================
+--- exp/aurelian/Operatr/operatr-0.1.c	2006-09-01 15:15:24 UTC (rev 35)
++++ exp/aurelian/Operatr/operatr-0.1.c	2006-09-01 17:40:29 UTC (rev 36)
+@@ -0,0 +1,79 @@
++//
++// $Id$
++//
++// gcc -o operatr operatr
++//
++#include <stdio.h>
++#include <stdlib.h>
++#include <sys/types.h> 
++#include <sys/socket.h>
++#include <netinet/in.h>
++#include <netdb.h>
++#include <string.h>
++
++#define TRUE  1
++#define FALSE 0
++
++#define HTTP_PORT 80
++
++void error(char *message)
++{
++    perror(message);
++    exit(1);
++}
++
++int main(int argc, char *argv[])
++{
++    int sockfd;
++    char s[200];
++    char old_line[200];
++    char request[300];
++    FILE *fp;
++    struct sockaddr_in serv_addr;
++    struct hostent *server;
++    int opt= TRUE;
++    
++    // server:
++    server = gethostbyname(argv[1]);
++    if (server == NULL) {
++        fprintf(stderr,"ERROR, no such host\n");
++        exit(0);
++    }
++    
++    // socket:
++    sockfd = socket(PF_INET, SOCK_STREAM, 0);
++    // sockfd = socket ( PF_INET, SOCK_RAW, IPPROTO_RAW );
++    if (sockfd < 0) {
++        error("ERROR opening socket");
++    }
++    // socket options:
++    // setsockopt(sockfd,SOL_SOCKET,SO_REUSEADDR, (char *)&opt,sizeof(opt));
++    // setsockopt(sockfd, IPPROTO_IP, IP_HDRINCL, (char *)&opt,sizeof(opt));
++    
++    // connect:
++    serv_addr.sin_family = AF_INET;
++    bcopy((char *)server->h_addr, (char *)&serv_addr.sin_addr.s_addr, server->h_length);
++    serv_addr.sin_port = htons(HTTP_PORT);
++    
++    if (connect(sockfd, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0) {
++        error("ERROR connecting");
++    }
++
++    // file descriptor
++    fp = fdopen(sockfd, "r+");
++    // fillin the request:
++    sprintf(request, "GET / HTTP/1.1\r\nHost: %s\r\nUser-Agent: Operatr/0.1 [%s-%s]\r\nReferer: %s\r\n\r\n", 
++                     argv[1],__DATE__,__TIME__,
++                     "http://www.example.org");
++    // send request:
++    fprintf(fp, request);
++    printf( request );
++    // ensure it got out
++    fflush(fp);
++    // response:
++    // while ( fgets(s, sizeof(s), fp) != 0 ) {
++    //     fputs(s, stdout);
++    // }
++    fclose(fp);
++}
++
+
+
+Property changes on: exp/aurelian/Operatr/operatr-0.1.c
+___________________________________________________________________
+Name: svn:keywords
+   + Id
+
+Added: exp/aurelian/Operatr/operatr.c
+===================================================================
+--- exp/aurelian/Operatr/operatr.c	2006-09-01 15:15:24 UTC (rev 35)
++++ exp/aurelian/Operatr/operatr.c	2006-09-01 17:40:29 UTC (rev 36)
+@@ -0,0 +1,132 @@
++//
++// $Id$
++//
++// gcc -o operatr operatr.c
++//
++#include <stdio.h>
++#include <stdlib.h>
++#include <sys/types.h> 
++#include <sys/socket.h>
++#include <netinet/in.h>
++#include <netinet/ip.h>
++#include <netinet/tcp.h>
++#include <netdb.h>
++#include <string.h>
++
++#define TRUE  1
++#define FALSE 0
++
++#define HTTP_PORT 80
++
++void error(char *message)
++{
++    perror(message);
++    exit(1);
++}
++
++int main(int argc, char *argv[])
++{
++    int sockfd;
++    
++    char packet[4096]; /* Datagram */
++    
++    char s[200];
++    char request[300];
++    FILE *fp;
++    struct sockaddr_in serv_addr;
++    struct hostent *server;
++    int opt= TRUE;
++    
++    struct iphdr *ip = (struct iphdr *) packet;
++    struct tcphdr *tcp = (struct tcphdr *) packet + sizeof(struct iphdr);
++    
++    // server:
++    server = gethostbyname(argv[1]);
++    if (server == NULL) {
++        fprintf(stderr,"ERROR, no such host\n");
++        exit(0);
++    }
++    
++    // socket:
++    sockfd = socket(AF_INET, SOCK_RAW, IPPROTO_TCP);
++    // sockfd = socket ( PF_INET, SOCK_RAW, IPPROTO_RAW );
++    if (sockfd < 0) {
++        error("ERROR opening socket");
++    }
++
++    // socket options:
++    // setsockopt(sockfd,SOL_SOCKET,SO_REUSEADDR, (char *)&opt,sizeof(opt));
++    setsockopt(sockfd, IPPROTO_IP, IP_HDRINCL, (char *)&opt,sizeof(opt));
++    
++    // connect:
++    serv_addr.sin_family = AF_INET;
++    bcopy((char *)server->h_addr, (char *)&serv_addr.sin_addr.s_addr, server->h_length);
++    serv_addr.sin_port = htons ( HTTP_PORT );
++    
++    // Fill in IP headers.
++    ip->ihl = 5;
++    ip->version = 4;
++    ip->tot_len = sizeof(struct iphdr) + sizeof(struct tcphdr);
++    ip->id = htons(1337);
++    ip->saddr = inet_addr("27.90.90.191");
++    ip->daddr = inet_ntoa(serv_addr.sin_addr);
++    ip->ttl = 255;
++    ip->protocol = 6;
++    ip->check = 0;
++    ip->tos = 0;
++    ip->frag_off = 0;
++
++    // Fill in TCP headers.
++    tcp->source = htons(1337);
++    tcp->dest = htons(HTTP_PORT);
++    tcp->seq = htons(random());
++    tcp->ack = 0;
++    tcp->syn = 1;
++    tcp->window = htons(65535);
++    tcp->check = 0;
++    tcp->doff = 5;
++    tcp->rst = 0;
++    tcp->psh = 0;
++    tcp->fin = 0;
++    tcp->urg = 0;
++    tcp->ack_seq = htons(0);
++    
++    
++    // if ( connect ( sockfd, (struct sockaddr *)&serv_addr, sizeof ( serv_addr ) ) < 0 ) {
++    //      error ( "ERROR connecting" );
++    // }
++
++    // file descriptor
++    // fp = fdopen ( sockfd, "r+" );
++    // fillin the request:
++    // sprintf ( request, "GET / HTTP/1.1\r\nHost: %s\r\nUser-Agent: Operatr/0.1 [%s-%s]\r\nReferer: %s\r\n\r\n", 
++    //                    argv[1], __DATE__,__TIME__,
++    //                    "http://bezna.org" );
++    // send request:
++    // fprintf(fp, request);
++    // printf(request);
++    // ensure it got out
++    // fflush (fp);
++    // response:
++    // while (fgets(s, sizeof(s), fp) != 0) {
++    //       fputs(s, stdout);
++    // }
++    // fclose( fp );
++
++    // send( sockfd, request, sizeof( request ), 0 );
++    
++    if (sendto(sockfd, packet, ip->tot_len, 0, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0 ) {
++        error("ERROR Sending");
++    }
++    
++    close( sockfd );
++    
++    /*
++    if (send(sockfd, argv[1], strlen(argv[1])+1, 0) < 0) {
++        error("ERROR Sending");
++    }
++    */
++    
++    // printf("Hello Socket!\n");
++}
++
+
+
+Property changes on: exp/aurelian/Operatr/operatr.c
+___________________________________________________________________
+Name: svn:keywords
+   + Id
+
+
+

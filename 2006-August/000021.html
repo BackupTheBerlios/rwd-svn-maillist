@@ -1,0 +1,151 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Rwd-svn] r30 - in trunk/human.r/app: controllers views/layouts
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/rwd-svn/2006-August/index.html" >
+   <LINK REL="made" HREF="mailto:rwd-svn%40lists.berlios.de?Subject=Re%3A%20%5BRwd-svn%5D%20r30%20-%20in%20trunk/human.r/app%3A%20controllers%20views/layouts&In-Reply-To=%3C200608181422.k7IEMW5n027188%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000020.html">
+   <LINK REL="Next"  HREF="000022.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Rwd-svn] r30 - in trunk/human.r/app: controllers views/layouts</H1>
+    <B>rwd-svn at lists.berlios.de</B> 
+    <A HREF="mailto:rwd-svn%40lists.berlios.de?Subject=Re%3A%20%5BRwd-svn%5D%20r30%20-%20in%20trunk/human.r/app%3A%20controllers%20views/layouts&In-Reply-To=%3C200608181422.k7IEMW5n027188%40sheep.berlios.de%3E"
+       TITLE="[Rwd-svn] r30 - in trunk/human.r/app: controllers views/layouts">rwd-svn at lists.berlios.de
+       </A><BR>
+    <I>Fri Aug 18 16:22:32 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000020.html">[Rwd-svn] r29 - in trunk/human.r/public: images images/src	stylesheets
+</A></li>
+        <LI>Next message: <A HREF="000022.html">[Rwd-svn] r31 - in trunk: . human.r
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#21">[ date ]</a>
+              <a href="thread.html#21">[ thread ]</a>
+              <a href="subject.html#21">[ subject ]</a>
+              <a href="author.html#21">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: aurelian
+Date: 2006-08-18 16:22:31 +0200 (Fri, 18 Aug 2006)
+New Revision: 30
+
+Modified:
+   trunk/human.r/app/controllers/departments_controller.rb
+   trunk/human.r/app/views/layouts/main.rhtml
+Log:
+ -- layout
+
+Modified: trunk/human.r/app/controllers/departments_controller.rb
+===================================================================
+--- trunk/human.r/app/controllers/departments_controller.rb	2006-08-18 14:17:11 UTC (rev 29)
++++ trunk/human.r/app/controllers/departments_controller.rb	2006-08-18 14:22:31 UTC (rev 30)
+@@ -1,3 +1,6 @@
++#
++# $Id: $
++#
+ class DepartmentsController &lt; ApplicationController
+   def index
+     list
+
+Modified: trunk/human.r/app/views/layouts/main.rhtml
+===================================================================
+--- trunk/human.r/app/views/layouts/main.rhtml	2006-08-18 14:17:11 UTC (rev 29)
++++ trunk/human.r/app/views/layouts/main.rhtml	2006-08-18 14:22:31 UTC (rev 30)
+@@ -1,13 +1,57 @@
+-&lt;html&gt;
++&lt;!DOCTYPE html PUBLIC &quot;-//W3C//DTD XHTML 1.0 Strict//EN&quot;
++    &quot;<A HREF="http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd</A>&quot;&gt;
++&lt;html xmlns=&quot;<A HREF="http://www.w3.org/1999/xhtml">http://www.w3.org/1999/xhtml</A>&quot; xml:lang=&quot;en&quot; lang=&quot;en-UK&quot;&gt;
+ &lt;head&gt;
+-  &lt;title&gt;Human.R :: &lt;%= controller.controller_name%&gt;/&lt;%= controller.action_name %&gt;&lt;/title&gt;
+-  &lt;%= stylesheet_link_tag 'scaffold' %&gt;
++  &lt;title&gt;Human.R :: &lt;%= controller.controller_name.singularize.capitalize -%&gt;/&lt;%= controller.action_name -%&gt;&lt;/title&gt;
++  &lt;meta http-equiv=&quot;content-type&quot; content=&quot;application/xhtml+xml; charset=UTF-8&quot; /&gt;
++  &lt;%= stylesheet_link_tag 'human.r.css' -%&gt;
++  &lt;%= stylesheet_link_tag 'scaffold' -%&gt;
+ &lt;/head&gt;
+ &lt;body&gt;
+ 
+-&lt;p style=&quot;color: green&quot;&gt;&lt;%= flash[:notice] %&gt;&lt;/p&gt;
++&lt;div id=&quot;content&quot;&gt;
+ 
+-&lt;%= @content_for_layout %&gt;
++  &lt;div id=&quot;header&quot;&gt;
+ 
++    &lt;div id=&quot;title&quot;&gt;
++      &lt;h1&gt;Human.R&lt;/h1&gt;
++      &lt;h2&gt;Sub.Title&lt;/h2&gt;
++    &lt;/div&gt;
++
++    &lt;div id=&quot;mainMenu&quot;&gt;
++      &lt;ul&gt; 
++        &lt;li&gt;&lt;%= link_to &quot;Locations&quot;, :controller=&gt;'locations'-%&gt;&lt;/li&gt;
++        &lt;li&gt;&lt;%= link_to &quot;Departments&quot;, :controller=&gt;'departments'-%&gt;&lt;/li&gt;
++        &lt;li&gt;&lt;%= link_to &quot;Jobs&quot;, :controller=&gt;'jobs'-%&gt;&lt;/li&gt;
++        &lt;li&gt;&lt;%= link_to &quot;Employees&quot;, :controller=&gt;'employees'-%&gt;&lt;/li&gt;
++      &lt;/ul&gt;
++    &lt;/div&gt;
++  &lt;/div&gt;
++
++  &lt;div id=&quot;page&quot;&gt;
++    &lt;p style=&quot;color: green&quot;&gt;&lt;%= flash[:notice] %&gt;&lt;/p&gt;
++    &lt;%= yield %&gt;
++  &lt;/div&gt;
++
++&lt;/div&gt;
++
++&lt;div id=&quot;footer&quot;&gt;
++
++  &lt;div id=&quot;width&quot;&gt;
++
++    &lt;span style=&quot;float: left&quot;&gt;
++      Made by &lt;a href=&quot;<A HREF="http://www.locknet.ro">http://www.locknet.ro</A>&quot;&gt;locknet.ro&lt;/a&gt;
++    &lt;/span&gt;
++
++    &lt;span style=&quot;float: right&quot;&gt;
++      &lt;%= link_to &quot;Locations&quot;, :controller=&gt;'locations'-%&gt; | 
++      &lt;%= link_to &quot;Departments&quot;, :controller=&gt;'departments'-%&gt; | 
++      &lt;%= link_to &quot;Jobs&quot;, :controller=&gt;'jobs'-%&gt; | 
++      &lt;%= link_to &quot;Employees&quot;, :controller=&gt;'employees'-%&gt;
++    &lt;/span&gt;
++  &lt;/div&gt;
++
++&lt;/div&gt;
++
+ &lt;/body&gt;
+ &lt;/html&gt;
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000020.html">[Rwd-svn] r29 - in trunk/human.r/public: images images/src	stylesheets
+</A></li>
+	<LI>Next message: <A HREF="000022.html">[Rwd-svn] r31 - in trunk: . human.r
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#21">[ date ]</a>
+              <a href="thread.html#21">[ thread ]</a>
+              <a href="subject.html#21">[ subject ]</a>
+              <a href="author.html#21">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/rwd-svn">More information about the Rwd-svn
+mailing list</a><br>
+</body></html>

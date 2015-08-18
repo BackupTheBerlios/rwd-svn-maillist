@@ -1,0 +1,208 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Rwd-svn] r32 - in trunk/human.r: app/models app/views/employees	app/views/layouts public/stylesheets
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/rwd-svn/2006-August/index.html" >
+   <LINK REL="made" HREF="mailto:rwd-svn%40lists.berlios.de?Subject=Re%3A%20%5BRwd-svn%5D%20r32%20-%20in%20trunk/human.r%3A%20app/models%20app/views/employees%0A%09app/views/layouts%20public/stylesheets&In-Reply-To=%3C200608211459.k7LExmG9014270%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000022.html">
+   <LINK REL="Next"  HREF="000024.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Rwd-svn] r32 - in trunk/human.r: app/models app/views/employees	app/views/layouts public/stylesheets</H1>
+    <B>rwd-svn at lists.berlios.de</B> 
+    <A HREF="mailto:rwd-svn%40lists.berlios.de?Subject=Re%3A%20%5BRwd-svn%5D%20r32%20-%20in%20trunk/human.r%3A%20app/models%20app/views/employees%0A%09app/views/layouts%20public/stylesheets&In-Reply-To=%3C200608211459.k7LExmG9014270%40sheep.berlios.de%3E"
+       TITLE="[Rwd-svn] r32 - in trunk/human.r: app/models app/views/employees	app/views/layouts public/stylesheets">rwd-svn at lists.berlios.de
+       </A><BR>
+    <I>Mon Aug 21 16:59:48 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000022.html">[Rwd-svn] r31 - in trunk: . human.r
+</A></li>
+        <LI>Next message: <A HREF="000024.html">[Rwd-svn] r33 - / exp exp/aurelian exp/aurelian/KWatchr
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#23">[ date ]</a>
+              <a href="thread.html#23">[ thread ]</a>
+              <a href="subject.html#23">[ subject ]</a>
+              <a href="author.html#23">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: aurelian
+Date: 2006-08-21 16:59:47 +0200 (Mon, 21 Aug 2006)
+New Revision: 32
+
+Modified:
+   trunk/human.r/app/models/employee.rb
+   trunk/human.r/app/views/employees/list.rhtml
+   trunk/human.r/app/views/layouts/main.rhtml
+   trunk/human.r/public/stylesheets/human.r.css
+Log:
+ -- layout :D
+
+Modified: trunk/human.r/app/models/employee.rb
+===================================================================
+--- trunk/human.r/app/models/employee.rb	2006-08-18 14:23:25 UTC (rev 31)
++++ trunk/human.r/app/models/employee.rb	2006-08-21 14:59:47 UTC (rev 32)
+@@ -13,8 +13,8 @@
+ 
+     validates_uniqueness_of :email
+     validates_inclusion_of :salary, :within=&gt; 200..999999
++    validates_inclusion_of :commission, :within =&gt; 0..200
+     validates_presence_of :last_name, :first_name, :email
+-    validates_length_of :commission, :maximum =&gt; 2
+ 
+     validate :commission_percent
+ 
+
+Modified: trunk/human.r/app/views/employees/list.rhtml
+===================================================================
+--- trunk/human.r/app/views/employees/list.rhtml	2006-08-18 14:23:25 UTC (rev 31)
++++ trunk/human.r/app/views/employees/list.rhtml	2006-08-21 14:59:47 UTC (rev 32)
+@@ -2,9 +2,11 @@
+ 
+ &lt;table&gt;
+   &lt;tr&gt;
+-  &lt;% for column in Employee.content_columns %&gt;
+-    &lt;th&gt;&lt;%= column.human_name %&gt;&lt;/th&gt;
+-  &lt;% end %&gt;
++    &lt;th&gt;First Name&lt;/th&gt;
++    &lt;th&gt;Last Name&lt;/th&gt;
++    &lt;th&gt;Email&lt;/th&gt;
++    &lt;th&gt;Salary&lt;/th&gt;
++    &lt;th&gt;Commission&lt;/th&gt;
+   &lt;/tr&gt;
+   
+ &lt;% for employee in @employees %&gt;
+
+Modified: trunk/human.r/app/views/layouts/main.rhtml
+===================================================================
+--- trunk/human.r/app/views/layouts/main.rhtml	2006-08-18 14:23:25 UTC (rev 31)
++++ trunk/human.r/app/views/layouts/main.rhtml	2006-08-21 14:59:47 UTC (rev 32)
+@@ -26,6 +26,7 @@
+         &lt;li&gt;&lt;%= link_to &quot;Employees&quot;, :controller=&gt;'employees'-%&gt;&lt;/li&gt;
+       &lt;/ul&gt;
+     &lt;/div&gt;
++
+   &lt;/div&gt;
+ 
+   &lt;div id=&quot;page&quot;&gt;
+
+Modified: trunk/human.r/public/stylesheets/human.r.css
+===================================================================
+--- trunk/human.r/public/stylesheets/human.r.css	2006-08-18 14:23:25 UTC (rev 31)
++++ trunk/human.r/public/stylesheets/human.r.css	2006-08-21 14:59:47 UTC (rev 32)
+@@ -37,12 +37,11 @@
+ }
+ 
+ #header {
+-  position: relative;
++  /* position: relative; */
+ }
+ 
+-/* Holds the site title and subtitle */
+ #header #title { 
+-  padding: 5px;
++  float:left;
+ }
+ 
+ #header h1 {
+@@ -55,20 +54,18 @@
+ }
+ 
+ #header h2 {
++  color: #F0C000;
+   position: absolute;
+   top: 40px;
+-  left: 115px;
++  left: 215px;
+   margin: 0;
+   padding: 0;
+   font: 700 2em &quot;trebuchet ms&quot;, serif;
+   text-transform: lowercase;
+-  color: #FCC000;
+ }
+ 
+ #mainMenu { 
+   float: right;
+-  width: 100%;
+-  clear: both;
+   margin: 1em;
+ }
+ 
+@@ -91,17 +88,18 @@
+   font-size: 1.6em;
+   text-decoration: none;
+   text-transform: lowercase;
+-  color: #6A0202;
++  color: #FCC00B;
+ }
+ 
+ #mainMenu li a:hover { 
+-  color: #0D0909;
++  color: #FF0909;
+ }
+ 
+ #page { 
+   float: left;
+   width: 100%;
+   clear: both;
++  margin-top: 2em;
+ }
+ 
+ #page a, #page a:visited {
+@@ -114,8 +112,13 @@
+ }
+ 
+ #page h1 {
++  /*color:#F98086;*/
++  display:compact;
++  font-size:28px;
++  padding:10px;/* 8px 8px 14px;*/
++  line-height:1em;
++  /*margin:30px 14px 0.25em 0;*/
+   background: #FFF url(/images/bkgd_red.gif) top left;
+-  height: 40px;
+ }
+ 
+ #footer { 
+@@ -123,7 +126,6 @@
+   width: 100%;
+   clear: both;
+   margin-top: -3.5em;
+-  /*padding-top: 2px;*/
+   height: 35px;
+   background: #000 url(/images/footer.gif) repeat-x top left;
+ }
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000022.html">[Rwd-svn] r31 - in trunk: . human.r
+</A></li>
+	<LI>Next message: <A HREF="000024.html">[Rwd-svn] r33 - / exp exp/aurelian exp/aurelian/KWatchr
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#23">[ date ]</a>
+              <a href="thread.html#23">[ thread ]</a>
+              <a href="subject.html#23">[ subject ]</a>
+              <a href="author.html#23">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/rwd-svn">More information about the Rwd-svn
+mailing list</a><br>
+</body></html>

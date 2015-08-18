@@ -1,0 +1,487 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Rwd-svn] r14 - in trunk/medickart: app/controllers app/helpers app/models app/views/layouts app/views/users db public/stylesheet
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/rwd-svn/2006-April/index.html" >
+   <LINK REL="made" HREF="mailto:rwd-svn%40lists.berlios.de?Subject=Re%3A%20%5BRwd-svn%5D%20r14%20-%20in%20trunk/medickart%3A%20app/controllers%20app/helpers%20app/models%20app/views/layouts%20app/views/users%20db%20public/stylesheet&In-Reply-To=%3C200604161633.k3GGXX51001758%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000005.html">
+   <LINK REL="Next"  HREF="000007.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Rwd-svn] r14 - in trunk/medickart: app/controllers app/helpers app/models app/views/layouts app/views/users db public/stylesheet</H1>
+    <B>rwd-svn-admin at lists.berlios.de</B> 
+    <A HREF="mailto:rwd-svn%40lists.berlios.de?Subject=Re%3A%20%5BRwd-svn%5D%20r14%20-%20in%20trunk/medickart%3A%20app/controllers%20app/helpers%20app/models%20app/views/layouts%20app/views/users%20db%20public/stylesheet&In-Reply-To=%3C200604161633.k3GGXX51001758%40sheep.berlios.de%3E"
+       TITLE="[Rwd-svn] r14 - in trunk/medickart: app/controllers app/helpers app/models app/views/layouts app/views/users db public/stylesheet">rwd-svn-admin at lists.berlios.de
+       </A><BR>
+    <I>Sun Apr 16 18:33:33 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000005.html">[Rwd-svn] r13 - in trunk/medickart: app/controllers app/helpers app/views app/views/admin app/views/layouts app/views/users public public/stylesheet scripts
+</A></li>
+        <LI>Next message: <A HREF="000007.html">[Rwd-svn] r15 - trunk/medickart
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#6">[ date ]</a>
+              <a href="thread.html#6">[ thread ]</a>
+              <a href="subject.html#6">[ subject ]</a>
+              <a href="author.html#6">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: aurelian
+Date: 2006-04-16 18:33:28 +0200 (Sun, 16 Apr 2006)
+New Revision: 14
+
+Added:
+   trunk/medickart/app/models/user.php
+Modified:
+   trunk/medickart/app/controllers/application.php
+   trunk/medickart/app/controllers/users_controller.php
+   trunk/medickart/app/helpers/users_helper.php
+   trunk/medickart/app/views/layouts/admin.phtml
+   trunk/medickart/app/views/users/add.phtml
+   trunk/medickart/app/views/users/edit.phtml
+   trunk/medickart/app/views/users/index.phtml
+   trunk/medickart/db/schema.sql
+   trunk/medickart/public/stylesheet/medickart.css
+Log:
+ -- more on users
+
+Modified: trunk/medickart/app/controllers/application.php
+===================================================================
+--- trunk/medickart/app/controllers/application.php	2006-04-16 13:33:46 UTC (rev 13)
++++ trunk/medickart/app/controllers/application.php	2006-04-16 16:33:28 UTC (rev 14)
+@@ -8,6 +8,8 @@
+  */
+ class ApplicationController extends ActionController {
+ 
++    protected $models= array('user');
++    
+     protected function authenticate() {
+         return TRUE;
+     }
+
+Modified: trunk/medickart/app/controllers/users_controller.php
+===================================================================
+--- trunk/medickart/app/controllers/users_controller.php	2006-04-16 13:33:46 UTC (rev 13)
++++ trunk/medickart/app/controllers/users_controller.php	2006-04-16 16:33:28 UTC (rev 14)
+@@ -16,22 +16,36 @@
+     /**
+      * Afiseaza toti utilizatori din sistem
+      */ 
+-    public function index() {    }
++    public function index() {
++        $this-&gt;users= User::find();
++    }
+ 
+     /**
+      * Afiseaza formularul ptr. adaugarea unui nou utilizator
+      */ 
+-	public function add() {    }
++	public function add() {
++        $this-&gt;user = new User();
++    }
+ 
+     /**
+      * Salveaza un nou utilizator in baza de date
+      */ 
+-    public function create() {    }
++    public function create() {
++        $this-&gt;user= new User($this-&gt;request-&gt;getParameter('user'));
++        if ($this-&gt;user-&gt;save() === FALSE) {
++            $this-&gt;render('add');
++        } else {
++            $this-&gt;flash('notice', '&lt;em&gt;' . $this-&gt;user-&gt;name . '&lt;/em&gt; created');
++            $this-&gt;redirect_to('index');
++        }        
++    }
+ 
+     /**
+      * Afizeaza formularul pentru editarea unui utilizator
+      */ 
+-	public function edit() {    }
++	public function edit() {
++        $this-&gt;user= User::find($this-&gt;request-&gt;getParameter('id'));
++    }
+ 
+     /**
+      * Actualizeaza un utilizator in baza de date
+
+Modified: trunk/medickart/app/helpers/users_helper.php
+===================================================================
+--- trunk/medickart/app/helpers/users_helper.php	2006-04-16 13:33:46 UTC (rev 13)
++++ trunk/medickart/app/helpers/users_helper.php	2006-04-16 16:33:28 UTC (rev 14)
+@@ -0,0 +1,21 @@
++&lt;?php
++// 
++// $Id$
++// 
++
++// Helper for UserController
++class UCHelper extends Object {
++
++    // verifica rolul utilizatorului
++    public static function role_to_human($role) {
++        return $role == User::ADMIN ? 'admin' : 'normal user';
++    }
++    
++    // de implementat.
++    // trebe sa converteasca date intr-un format mai uman
++    public static function last_login_to_human($date) {
++        return $date;
++    }
++    
++}
++    
+
+Added: trunk/medickart/app/models/user.php
+===================================================================
+--- trunk/medickart/app/models/user.php	2006-04-16 13:33:46 UTC (rev 13)
++++ trunk/medickart/app/models/user.php	2006-04-16 16:33:28 UTC (rev 14)
+@@ -0,0 +1,49 @@
++&lt;?php
++/**
++ * This class is part of shop project
++ *
++ * @package medickart.models
++ * $Id$
++ */
++class User extends ActiveRecord {
++
++    const ADMIN = 0;
++
++    const NORMAL= 1;
++    
++    protected function before_save() {
++        $this-&gt;validates()-&gt;presence_of('name', 'mail', 'pass');
++        $this-&gt;validates()-&gt;uniqueness_of('name', 'mail');
++        
++        // {{{ this will go to medick core, soon :)
++        if (strlen($this-&gt;name) &lt;= 3) { // validez daca numele are cel putin 4 caractere.
++            $this-&gt;row-&gt;getFieldByName('name')-&gt;addError('should have at least 4 chars.');
++        }
++        
++        $p = '/^([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})$/i';
++        if (!preg_match($p, $this-&gt;mail)) { // validez daca mailul are formatul corect.
++            $this-&gt;row-&gt;getFieldByName('mail')-&gt;addError('is not a valid email address');
++        }
++
++        // }}}
++
++        return true;
++    }
++    
++    protected function before_insert() {
++        $this-&gt;pass= md5($this-&gt;pass);
++        return true;
++    }
++    
++    /**
++     * Finds a User
++     *
++     * @see ActiveRecord::build()
++     * @return mixed
++     */
++    public static function find() {
++        $args = func_get_args();
++        return ActiveRecord::build(new QueryBuilder(__CLASS__, $args));
++    }
++}
++  
+
+
+Property changes on: trunk/medickart/app/models/user.php
+___________________________________________________________________
+Name: svn:keywords
+   + Id
+
+Modified: trunk/medickart/app/views/layouts/admin.phtml
+===================================================================
+--- trunk/medickart/app/views/layouts/admin.phtml	2006-04-16 13:33:46 UTC (rev 13)
++++ trunk/medickart/app/views/layouts/admin.phtml	2006-04-16 16:33:28 UTC (rev 14)
+@@ -2,6 +2,7 @@
+      &lt;head&gt;
+          &lt;title&gt;admin&lt;/title&gt;
+          &lt;base href=&quot;&lt;?=$__server;?&gt;&lt;?=$__base;?&gt;/&quot; /&gt;
++         &lt;!-- $Id$ --&gt;
+          &lt;link rel=&quot;stylesheet&quot; href=&quot;stylesheet/medickart.css&quot; /&gt;
+          &lt;meta http-equiv=&quot;Content-Type&quot; content=&quot;text/html; charset=UTF-8&quot; /&gt;
+      &lt;/head&gt;
+
+Modified: trunk/medickart/app/views/users/add.phtml
+===================================================================
+--- trunk/medickart/app/views/users/add.phtml	2006-04-16 13:33:46 UTC (rev 13)
++++ trunk/medickart/app/views/users/add.phtml	2006-04-16 16:33:28 UTC (rev 14)
+@@ -1 +1,55 @@
+-UsersController#add
+\ No newline at end of file
++&lt;!-- $Id$ --&gt;
++&lt;form action=&quot;&lt;?=URL::create('users','create');?&gt;&quot; method=&quot;post&quot;&gt;
++  &lt;fieldset&gt;
++    &lt;legend&gt;Add User&lt;/legend&gt;
++
++    &lt;?=ActiveRecordHelper::error_messages_for($user);?&gt;
++    &lt;dl&gt;
++        &lt;dt&gt;
++            &lt;label for=&quot;user_name&quot;&gt;Name:&lt;/label&gt;
++         &lt;/dt&gt;
++        &lt;dd&gt;&lt;?=FormHelper::text_field($user, 'name', array('size'=&gt;35));?&gt;&lt;/dd&gt;
++    &lt;/dl&gt;
++
++    &lt;dl&gt;
++        &lt;dt&gt;
++            &lt;label for=&quot;user_password&quot;&gt;Password:&lt;/label&gt;
++        &lt;/dt&gt;
++        &lt;dd&gt;&lt;?=FormHelper::password_field($user,'pass', array('size'=&gt;35));?&gt;&lt;/dd&gt;
++    &lt;/dl&gt;
++
++
++    &lt;dl&gt;
++        &lt;dt&gt;
++            &lt;label for=&quot;retype_password&quot;&gt;Re-Type Password:&lt;/label&gt;
++        &lt;/dt&gt;
++        &lt;dd&gt;
++            &lt;input type=&quot;passrord&quot; name=&quot;retypedpass&quot; id=&quot;retype_password&quot; /&gt;
++        &lt;!--&lt;?=FormHelper::password_field($user,'retypepass', array('size'=&gt;35));?&gt;--&gt;
++        &lt;/dd&gt;
++    &lt;/dl&gt;
++
++
++    &lt;dl&gt;
++        &lt;dt&gt;
++            &lt;label for=&quot;user_email&quot;&gt;Email:&lt;/label&gt;
++        &lt;/dt&gt;
++        &lt;dd&gt;&lt;?=FormHelper::text_field($user,'mail', array('size'=&gt;35));?&gt;&lt;/dd&gt;
++    &lt;/dl&gt;
++    &lt;dl&gt;
++        &lt;dt&gt;
++            &lt;label for=&quot;user_role&quot;&gt;Role:&lt;/label&gt;
++        &lt;/dt&gt;    
++        &lt;dd&gt;
++            &lt;select id=&quot;user_role&quot;&gt;
++                &lt;option value=&quot;0&quot; &lt;?=$user-&gt;role===0 ? 'selected' : '' ?&gt;&gt;Admin&lt;/option&gt;
++                &lt;option value=&quot;1&quot; &lt;?=$user-&gt;role===1 ? 'selected' : '' ?&gt;&gt;Normal User&lt;/option&gt;
++            &lt;/select&gt;
++        &lt;/dd&gt;
++    &lt;/dl&gt;
++
++    
++    &lt;div&gt;&lt;?=Form::submit('submit', 'Submit');?&gt;&lt;/div&gt;
++  &lt;/fieldset&gt;
++&lt;/form&gt;
++
+
+Modified: trunk/medickart/app/views/users/edit.phtml
+===================================================================
+--- trunk/medickart/app/views/users/edit.phtml	2006-04-16 13:33:46 UTC (rev 13)
++++ trunk/medickart/app/views/users/edit.phtml	2006-04-16 16:33:28 UTC (rev 14)
+@@ -1 +1,35 @@
+-UsersController#edit
+\ No newline at end of file
++&lt;!-- $Id$ --&gt;
++&lt;form action=&quot;&lt;?=URL::create('users','update');?&gt;&quot; method=&quot;post&quot;&gt;
++  &lt;fieldset&gt;
++    &lt;legend&gt;Edit User&lt;/legend&gt;
++    &lt;?=ActiveRecordHelper::error_messages_for($user);?&gt;
++    &lt;dl&gt;
++        &lt;dt&gt;&lt;label for=&quot;user_name&quot;&gt;Name:&lt;/label&gt;&lt;/dt&gt;
++        &lt;dd&gt;&lt;?=FormHelper::text_field($user, 'name', array('size'=&gt;35));?&gt;&lt;/dd&gt;
++    &lt;/dl&gt;
++    &lt;dl&gt;
++        &lt;dt&gt;&lt;label for=&quot;user_email&quot;&gt;Email:&lt;/label&gt;&lt;/dt&gt;
++        &lt;dd&gt;&lt;?=FormHelper::text_field($user,'mail', array('size'=&gt;35));?&gt;&lt;/dd&gt;
++    &lt;/dl&gt;
++    &lt;dl&gt;
++        &lt;dt&gt;&lt;label for=&quot;user_role&quot;&gt;Role:&lt;/label&gt;&lt;/dt&gt;
++        &lt;dd&gt;
++            &lt;select id=&quot;user_role&quot;&gt;
++                &lt;option value=&quot;0&quot; &lt;?=$user-&gt;role===0 ? 'selected' : '' ?&gt;&gt;Admin&lt;/option&gt;
++                &lt;option value=&quot;1&quot; &lt;?=$user-&gt;role===1 ? 'selected' : '' ?&gt;&gt;Normal User&lt;/option&gt;
++            &lt;/select&gt;
++        &lt;/dd&gt;
++    &lt;/dl&gt;
++    &lt;div&gt;&lt;?=Form::submit('submit', 'Save');?&gt;&lt;/div&gt;
++  &lt;/fieldset&gt;
++&lt;/form&gt;
++&lt;hr /&gt;
++&lt;form action=&quot;&lt;?=URL::create('users', 'change_password');?&gt;&quot; method=&quot;post&quot;&gt;
++    &lt;fieldset&gt;
++        &lt;legend&gt;Change Password&lt;/legend&gt;
++        &lt;dl&gt;&lt;dt&gt;&lt;label for=&quot;current_password&quot;&gt;Current Password: &lt;/label&gt;&lt;/dt&gt;&lt;dd&gt;&lt;input id=&quot;current_password&quot; type=&quot;password&quot; name=&quot;curent_password&quot;/&gt;&lt;/dd&gt;&lt;/dl&gt;
++        &lt;dl&gt;&lt;dt&gt;&lt;label for=&quot;new_password&quot;&gt;New Password: &lt;/label&gt;&lt;/dt&gt;&lt;dd&gt;&lt;input id=&quot;new_password&quot; type=&quot;password&quot; name=&quot;new_password&quot;/&gt;&lt;/dd&gt;&lt;/dl&gt;
++        &lt;dl&gt;&lt;dt&gt;&lt;label for=&quot;retype_password&quot;&gt;Re-type Password: &lt;/label&gt;&lt;/dt&gt;&lt;dd&gt;&lt;input id=&quot;retype_password&quot; type=&quot;password&quot; name=&quot;retype_password&quot;/&gt;&lt;/dd&gt;&lt;/dl&gt;
++        &lt;div&gt;&lt;?=Form::submit('submit', 'Change');?&gt;&lt;/div&gt;
++    &lt;/fieldset&gt;
++&lt;/form&gt;
+
+Modified: trunk/medickart/app/views/users/index.phtml
+===================================================================
+--- trunk/medickart/app/views/users/index.phtml	2006-04-16 13:33:46 UTC (rev 13)
++++ trunk/medickart/app/views/users/index.phtml	2006-04-16 16:33:28 UTC (rev 14)
+@@ -1 +1,24 @@
+-UsersController#index
+\ No newline at end of file
++&lt;h2&gt;UsersController#index&lt;/h2&gt;
++
++&lt;!-- $Id: --&gt;
++
++
++&lt;? if ($users-&gt;size()!=0):?&gt;
++    &lt;? foreach ($users as $user): ?&gt;
++        &lt;a href=&quot;&lt;?=URL::create('users', 'edit', array('id'=&gt;$user-&gt;id));?&gt;&quot;&gt;Edit&lt;/a&gt; / 
++        &lt;a href=&quot;&lt;?=URL::create('users', 'delete', array('id'=&gt;$user-&gt;id));?&gt;&quot;&gt;Delete&lt;/a&gt; --- 
++        &lt;b&gt;Name:&lt;/b&gt; &lt;?=$user-&gt;name;?&gt; / 
++        &lt;b&gt;Role:&lt;/b&gt; &lt;?=UCHelper::role_to_human($user-&gt;role);?&gt;
++        &lt;? if ($user-&gt;last_login !== NULL): ?&gt;
++            / &lt;b&gt;Last Login:&lt;/b&gt; &lt;?=UCHelper::last_login_to_human($user-&gt;last_login);?&gt;
++        &lt;? endif; ?&gt;
++        &lt;br /&gt;
++    &lt;? endforeach; ?&gt;
++&lt;? else: ?&gt;
++    No users
++&lt;? endif; ?&gt;
++
++&lt;hr /&gt;
++
++&lt;a href=&quot;&lt;?=URL::create('users','add');?&gt;&quot;&gt;Add a new User&lt;/a&gt;
++
+
+Modified: trunk/medickart/db/schema.sql
+===================================================================
+--- trunk/medickart/db/schema.sql	2006-04-16 13:33:46 UTC (rev 13)
++++ trunk/medickart/db/schema.sql	2006-04-16 16:33:28 UTC (rev 14)
+@@ -142,13 +142,16 @@
+ 
+ -- 
+ -- {{{ Table structure for table `users`
++-- role tinyint, este 0 ptr. super admin -&gt; are access la zona de administrare sau 1 ptr. normal -&gt; alte chestii.
++-- last_login este null si va fi actualizat la primul login. mai tarziu, o sa validam userii noi prin mail si o sa folosim acest NULL
+ 
+ CREATE TABLE `users` (
+   `id`          INT     ( 10 )  unsigned NOT NULL auto_increment,
+-  `username`    VARCHAR ( 255 )          NOT NULL,
+-  `password`    VARCHAR ( 32 )           NOT NULL,
+-  `email`       VARCHAR ( 255 )          NOT NULL,
+-  `last_login`  TIMESTAMP                NOT NULL default CURRENT_TIMESTAMP,
++  `name`        VARCHAR ( 255 )          NOT NULL,
++  `pass`        VARCHAR ( 32 )           NOT NULL,
++  `mail`        VARCHAR ( 255 )          NOT NULL,
++  `role`        TINYINT (  1  )          NOT NULL,
++  `last_login`  TIMESTAMP                    NULL,
+   PRIMARY KEY  (`id`)
+ ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+ 
+
+Modified: trunk/medickart/public/stylesheet/medickart.css
+===================================================================
+--- trunk/medickart/public/stylesheet/medickart.css	2006-04-16 13:33:46 UTC (rev 13)
++++ trunk/medickart/public/stylesheet/medickart.css	2006-04-16 16:33:28 UTC (rev 14)
+@@ -27,6 +27,7 @@
+ #content {
+     padding:20px 20px 5px 20px;
+     margin-left:200px;
++    border-left: 2px solid #555;
+ }
+ 
+ #sidebar {
+@@ -52,12 +53,8 @@
+ 	text-decoration:underline;
+ }
+ 
+-.box {
++.box {      }
+ 
+-    
+-    
+-}
+-
+ .box-heading {
+     background-color: #C24A4B;
+     color: #fff;
+@@ -65,10 +62,53 @@
+     font-size: 1.4em;
+     text-align: center;
+     padding: 0.8em;
+-    
+ }
+ 
++.box-contents {     }
++
+ .side-nav li {
+     list-style-type:none;
+     padding:0.1em 0;
+ }
++
++/* forms */
++
++fieldset {
++    border: none;
++}
++
++legend {
++    font-weight : bold;
++    color : #333;
++    margin : 0;
++    padding : 0.5em;
++}
++
++label {
++    display : block;
++}
++
++fieldset dd input {
++	width: 200px;
++	border : 1px solid #900;
++	padding : 1px;
++}
++	
++fieldset dd select {
++	font-size : 100%;
++	width: 200px;
++	border : 1px solid #900;
++	padding : 1px;
++}
++
++input {
++    margin: 2px;
++}
++
++/* medick validation */
++div.fieldWithErrors {
++    background-color: red;
++    display: table;
++    padding: 2px;
++}
++
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000005.html">[Rwd-svn] r13 - in trunk/medickart: app/controllers app/helpers app/views app/views/admin app/views/layouts app/views/users public public/stylesheet scripts
+</A></li>
+	<LI>Next message: <A HREF="000007.html">[Rwd-svn] r15 - trunk/medickart
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#6">[ date ]</a>
+              <a href="thread.html#6">[ thread ]</a>
+              <a href="subject.html#6">[ subject ]</a>
+              <a href="author.html#6">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/rwd-svn">More information about the Rwd-svn
+mailing list</a><br>
+</body></html>
